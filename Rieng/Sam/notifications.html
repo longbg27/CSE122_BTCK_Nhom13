@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thông báo – CultureTrail</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> Hành trình văn hóa</a>
+      <nav class="nav-main" aria-label="Khu vực nghệ nhân">
+        <a href="creator-dashboard.html">Bảng điều khiển</a>
+        <a href="creator-story-management.html">Câu chuyện</a>
+        <a href="creator-event-management.html">Sự kiện</a>
+        <a href="creator-profile.html">Hồ sơ</a>
+      </nav>
+      <div class="header-actions">
+        <a href="notifications.html" class="btn-icon notif-btn" aria-label="Thông báo" aria-current="page" title="Thông báo">
+          <span aria-hidden="true">🔔</span><span class="notif-badge hidden" data-notif-badge>0</span>
+        </a>
+        <a href="creator-profile.html" class="avatar-link" aria-label="Hồ sơ của tôi">
+          <img src="https://i.pravatar.cc/150?img=12" alt="" class="user-avatar" data-user-avatar>
+        </a>
+        <button class="menu-toggle" aria-label="Mở menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content" id="main-content">
+    <div class="container" style="max-width:900px;">
+      <div class="page-header flex-between" style="flex-wrap:wrap;gap:1rem;">
+        <div>
+          <h1>Thông báo</h1>
+          <p class="subtitle">Cập nhật về câu chuyện, sự kiện và hồ sơ nghệ nhân của bạn</p>
+        </div>
+        <button type="button" id="mark-all" class="btn btn-outline" disabled>✓ Đánh dấu tất cả đã đọc</button>
+      </div>
+
+      <div id="notif-loading" class="state-box">
+        <div class="spinner"></div>
+        <p>Đang tải thông báo...</p>
+      </div>
+
+      <div id="notif-error" class="hidden">
+        <div class="state-box">
+          <div class="icon" aria-hidden="true">⚠️</div>
+          <h2>Không tải được thông báo</h2>
+          <p>Dữ liệu thông báo chưa sẵn sàng. Kiểm tra kết nối rồi thử lại.</p>
+          <div class="state-actions">
+            <button type="button" class="btn btn-primary" id="retry-btn">Thử lại</button>
+            <a href="creator-dashboard.html" class="btn btn-ghost">Về Bảng điều khiển</a>
+          </div>
+        </div>
+      </div>
+
+      <div id="notif-area" class="hidden">
+        <div class="tabs" role="group" aria-label="Lọc thông báo">
+          <button type="button" class="tab active" data-filter="all" aria-pressed="true">
+            Tất cả <span class="tab-count" data-count="all">0</span>
+          </button>
+          <button type="button" class="tab" data-filter="unread" aria-pressed="false">
+            Chưa đọc <span class="tab-count" data-count="unread">0</span>
+          </button>
+          <button type="button" class="tab" data-filter="read" aria-pressed="false">
+            Đã đọc <span class="tab-count" data-count="read">0</span>
+          </button>
+        </div>
+
+        <p class="text-muted mb-2" id="notif-summary" aria-live="polite"></p>
+
+        <div id="notif-list"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 CultureTrail – BTL CSE122</div>
+    </div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    const USER_ID = getActiveCreatorId();
+
+    const TYPE_META = {
+      approval: { icon: '✅', label: 'Duyệt nội dung' },
+      warning: { icon: '⚠️', label: 'Cảnh báo' },
+      reminder: { icon: '📅', label: 'Sự kiện' },
+      social: { icon: '❤️', label: 'Cộng đồng' },
+      system: { icon: '⚙️', label: 'Hệ thống' }
+    };
+
+    const loadingEl = document.getElementById('notif-loading');
+    const errorEl = document.getElementById('notif-error');
+    const areaEl = document.getElementById('notif-area');
+    const listEl = document.getElementById('notif-list');
+    const summaryEl = document.getElementById('notif-summary');
+    const markAllBtn = document.getElementById('mark-all');
+
+    let notifications = [];
+    let activeFilter = 'all';
+
+    function unreadCount() {
+      return notifications.filter(n => !n.read).length;
+    }
+
+    function syncTabs() {
+      document.querySelectorAll('.tab[data-filter]').forEach(tab => {
+        const isActive = tab.dataset.filter === activeFilter;
+        tab.classList.toggle('active', isActive);
+        tab.setAttribute('aria-pressed', String(isActive));
+      });
+    }
+
+    function updateCounts() {
+      const counts = {
+        all: notifications.length,
+        unread: notifications.filter(n => !n.read).length,
+        read: notifications.filter(n => n.read).length
+      };
+      document.querySelectorAll('[data-count]').forEach(el => {
+        el.textContent = counts[el.dataset.count] ?? 0;
+      });
+      markAllBtn.disabled = counts.unread === 0;
+      if (counts.all === 0) {
+        summaryEl.textContent = 'Chưa có thông báo nào.';
+      } else if (counts.unread) {
+        summaryEl.textContent = `${counts.unread} thông báo chưa đọc trong ${counts.all} thông báo`;
+      } else {
+        summaryEl.textContent = `Bạn đã đọc hết ${counts.all} thông báo`;
+      }
+    }
+
+    function emptyState() {
+      if (!notifications.length) {
+        return `
+          <div class="state-box">
+            <div class="icon" aria-hidden="true">🔔</div>
+            <h3>Chưa có thông báo nào</h3>
+            <p>Thông báo về câu chuyện, sự kiện và hồ sơ sẽ xuất hiện ở đây.</p>
+          </div>`;
+      }
+      if (activeFilter === 'unread') {
+        return `
+          <div class="state-box">
+            <div class="icon" aria-hidden="true">🎉</div>
+            <h3>Bạn đã xem hết thông báo</h3>
+            <p>Không còn thông báo chưa đọc. Bạn có thể xem lại toàn bộ lịch sử.</p>
+            <div class="state-actions">
+              <button type="button" class="btn btn-outline" data-empty-filter="all">Xem tất cả thông báo</button>
+            </div>
+          </div>`;
+      }
+      return `
+        <div class="state-box">
+          <div class="icon" aria-hidden="true">📭</div>
+          <h3>Chưa có thông báo đã đọc</h3>
+          <p>Các thông báo bạn đã đọc sẽ được lưu tại đây.</p>
+          <div class="state-actions">
+            <button type="button" class="btn btn-outline" data-empty-filter="unread">Xem thông báo chưa đọc</button>
+          </div>
+        </div>`;
+    }
+
+    function renderItem(notice) {
+      const meta = TYPE_META[notice.type] || TYPE_META.system;
+      return `
+        <article class="notif-item ${notice.read ? '' : 'unread'}" data-id="${notice.id}">
+          <div class="notif-icon ${notice.type}" aria-hidden="true">${meta.icon}</div>
+          <div class="notif-body">
+            <h3 class="notif-title">${escapeHtml(notice.title)}</h3>
+            <p class="notif-text">${escapeHtml(notice.message)}</p>
+            <div class="notif-meta">
+              <time datetime="${notice.createdAt}" title="${formatDateTime(notice.createdAt)}">${relativeTime(notice.createdAt)}</time>
+              <span aria-hidden="true">·</span>
+              <span>${meta.label}</span>
+              ${notice.link ? `<a href="${notice.link}" data-link>${escapeHtml(notice.linkLabel || 'Xem chi tiết')} →</a>` : ''}
+            </div>
+          </div>
+          <div class="notif-actions">
+            ${notice.read
+              ? '<span class="text-muted" style="font-size:0.78rem;">✓ Đã đọc</span>'
+              : `<button type="button" class="btn btn-ghost btn-sm" data-action="read" data-id="${notice.id}">Đánh dấu đã đọc</button>`}
+          </div>
+        </article>`;
+    }
+
+    function render() {
+      updateCounts();
+      syncTabs();
+
+      const list = notifications.filter(n => {
+        if (activeFilter === 'unread') return !n.read;
+        if (activeFilter === 'read') return n.read;
+        return true;
+      });
+
+      listEl.innerHTML = list.length
+        ? `<div class="notif-list">${list.map(renderItem).join('')}</div>`
+        : emptyState();
+    }
+
+    async function refreshBadge() {
+      if (window.updateNotifBadge) await updateNotifBadge();
+    }
+
+    async function markRead(id, silent) {
+      await API.markNotificationRead(id);
+      const notice = notifications.find(n => n.id === id);
+      if (notice) notice.read = true;
+      render();
+      await refreshBadge();
+      if (!silent) showToast('Đã đánh dấu thông báo là đã đọc.', 'success');
+    }
+
+    async function load() {
+      loadingEl.classList.remove('hidden');
+      errorEl.classList.add('hidden');
+      areaEl.classList.add('hidden');
+
+      try {
+        const list = await API.getNotifications(USER_ID);
+        if (!list.length && API.getLoadError('notifications.json')) {
+          throw new Error('load');
+        }
+        notifications = list;
+        loadingEl.classList.add('hidden');
+        areaEl.classList.remove('hidden');
+        render();
+        await refreshBadge();
+      } catch (err) {
+        loadingEl.classList.add('hidden');
+        errorEl.classList.remove('hidden');
+      }
+    }
+
+    listEl.addEventListener('click', async (e) => {
+      const emptyFilterBtn = e.target.closest('[data-empty-filter]');
+      if (emptyFilterBtn) {
+        activeFilter = emptyFilterBtn.dataset.emptyFilter;
+        render();
+        return;
+      }
+
+      const readBtn = e.target.closest('[data-action="read"]');
+      if (readBtn) {
+        readBtn.disabled = true;
+        await markRead(readBtn.dataset.id, false);
+        return;
+      }
+
+      const link = e.target.closest('[data-link]');
+      if (link) {
+        const item = link.closest('.notif-item');
+        const notice = item ? notifications.find(n => n.id === item.dataset.id) : null;
+        if (notice && !notice.read) {
+          e.preventDefault();
+          const target = link.getAttribute('href');
+          await markRead(notice.id, true);
+          location.href = target;
+        }
+      }
+    });
+
+    markAllBtn.addEventListener('click', async () => {
+      if (!unreadCount()) return;
+      setLoading(markAllBtn, true, 'Đang cập nhật...');
+      await API.markAllNotificationsRead(USER_ID);
+      notifications.forEach(n => { n.read = true; });
+      setLoading(markAllBtn, false);
+      render();
+      await refreshBadge();
+      showToast('Đã đánh dấu tất cả thông báo là đã đọc.', 'success');
+    });
+
+    document.querySelectorAll('.tab[data-filter]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        activeFilter = tab.dataset.filter;
+        render();
+      });
+    });
+
+    document.getElementById('retry-btn').addEventListener('click', load);
+
+    load();
+  </script>
+</body>
+</html>
