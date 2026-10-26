@@ -1,0 +1,38 @@
+[
+  {
+    "id": "col-001",
+    "title": "Huyền thoại đất Việt",
+    "description": "Tập hợp các câu chuyện huyền thoại nổi tiếng từ Bắc vào Nam.",
+    "curatorId": "admin-001",
+    "storyIds": ["story-001", "story-003"],
+    "coverImage": "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800",
+    "status": "published",
+    "createdAt": "2025-09-01T00:00:00Z",
+    "updatedAt": "2025-10-05T00:00:00Z",
+    "views": 5400
+  },
+  {
+    "id": "col-002",
+    "title": "Làng nghề truyền thống",
+    "description": "Khám phá các làng nghề thủ công nổi tiếng của Việt Nam.",
+    "curatorId": "admin-001",
+    "storyIds": ["story-002", "story-004"],
+    "coverImage": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800",
+    "status": "published",
+    "createdAt": "2025-08-15T00:00:00Z",
+    "updatedAt": "2025-09-20T00:00:00Z",
+    "views": 3200
+  },
+  {
+    "id": "col-003",
+    "title": "Di sản phi vật thể UNESCO",
+    "description": "Các di sản văn hóa phi vật thể của Việt Nam được UNESCO công nhận.",
+    "curatorId": "admin-001",
+    "storyIds": ["story-005"],
+    "coverImage": "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800",
+    "status": "draft",
+    "createdAt": "2025-10-12T00:00:00Z",
+    "updatedAt": "2025-10-12T00:00:00Z",
+    "views": 180
+  }
+]

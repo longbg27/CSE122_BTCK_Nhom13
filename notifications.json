@@ -1,0 +1,90 @@
+[
+  {
+    "id": "notif-001",
+    "userId": "creator-001",
+    "type": "warning",
+    "title": "Câu chuyện bị từ chối",
+    "message": "“Truyền thuyết chưa kiểm chứng về đền Hùng” cần bổ sung nguồn tham chiếu trước khi gửi duyệt lại.",
+    "link": "creator-story-form.html?id=story-008",
+    "linkLabel": "Sửa câu chuyện",
+    "createdAt": "2026-10-24T08:15:00+07:00",
+    "read": false
+  },
+  {
+    "id": "notif-002",
+    "userId": "creator-001",
+    "type": "reminder",
+    "title": "Sự kiện đang diễn ra",
+    "message": "Tuần lễ gốm Bát Tràng đã bắt đầu. Theo dõi lượt đăng ký và cập nhật thông tin cho khách tham dự.",
+    "link": "creator-event-form.html?id=event-004",
+    "linkLabel": "Xem sự kiện",
+    "createdAt": "2026-10-24T07:00:00+07:00",
+    "read": false
+  },
+  {
+    "id": "notif-003",
+    "userId": "creator-001",
+    "type": "social",
+    "title": "Bạn có 12 người theo dõi mới",
+    "message": "Hồ sơ nghệ nhân của bạn đón thêm 12 người theo dõi trong tuần này.",
+    "link": "creator-profile.html",
+    "linkLabel": "Xem hồ sơ",
+    "createdAt": "2026-10-23T18:30:00+07:00",
+    "read": false
+  },
+  {
+    "id": "notif-004",
+    "userId": "creator-001",
+    "type": "approval",
+    "title": "Câu chuyện đã được xuất bản",
+    "message": "“Huyền thoại về Hồ Gươm và Rùa thần” đã được biên tập viên duyệt và hiển thị công khai.",
+    "link": "creator-story-management.html",
+    "linkLabel": "Quản lý câu chuyện",
+    "createdAt": "2026-10-22T14:10:00+07:00",
+    "read": true
+  },
+  {
+    "id": "notif-005",
+    "userId": "creator-001",
+    "type": "system",
+    "title": "Lịch bảo trì hệ thống",
+    "message": "CultureTrail sẽ bảo trì từ 23:00 ngày 27/10 đến 02:00 ngày 28/10. Dữ liệu demo của bạn vẫn được giữ nguyên.",
+    "link": null,
+    "linkLabel": null,
+    "createdAt": "2026-10-21T09:00:00+07:00",
+    "read": true
+  },
+  {
+    "id": "notif-006",
+    "userId": "creator-001",
+    "type": "reminder",
+    "title": "Sắp đến ngày diễn ra sự kiện",
+    "message": "“Ngày hội văn hóa Hồ Gươm 2026” sẽ diễn ra sau 3 tuần. Hãy kiểm tra sức chứa và mô tả sự kiện.",
+    "link": "creator-event-form.html?id=event-001",
+    "linkLabel": "Kiểm tra sự kiện",
+    "createdAt": "2026-10-20T16:45:00+07:00",
+    "read": true
+  },
+  {
+    "id": "notif-007",
+    "userId": "creator-001",
+    "type": "warning",
+    "title": "Sự kiện đã bị hủy",
+    "message": "“Chợ phiên làng nghề Bát Tràng” đã chuyển sang trạng thái Đã hủy. 45 người đăng ký sẽ nhận thông báo.",
+    "link": "creator-event-management.html",
+    "linkLabel": "Xem danh sách",
+    "createdAt": "2026-10-19T11:20:00+07:00",
+    "read": false
+  },
+  {
+    "id": "notif-008",
+    "userId": "creator-001",
+    "type": "approval",
+    "title": "Yêu cầu chỉnh sửa nội dung",
+    "message": "Biên tập viên đề nghị làm rõ nguồn gốc lễ hội trong “Lễ hội đền Hùng và tín ngưỡng thờ cúng tổ tiên”.",
+    "link": "creator-story-form.html?id=story-003",
+    "linkLabel": "Chỉnh sửa",
+    "createdAt": "2026-10-18T10:05:00+07:00",
+    "read": true
+  }
+]

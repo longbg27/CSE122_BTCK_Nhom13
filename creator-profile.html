@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hồ sơ nghệ nhân – CultureTrail</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> Hành trình văn hóa</a>
+      <nav class="nav-main" aria-label="Khu vực nghệ nhân">
+        <a href="creator-dashboard.html">Bảng điều khiển</a>
+        <a href="creator-story-management.html">Câu chuyện</a>
+        <a href="creator-event-management.html">Sự kiện</a>
+        <a href="creator-profile.html" class="active" aria-current="page">Hồ sơ</a>
+      </nav>
+      <div class="header-actions">
+        <a href="notifications.html" class="btn-icon notif-btn" aria-label="Thông báo" title="Thông báo">
+          <span aria-hidden="true">🔔</span><span class="notif-badge hidden" data-notif-badge>0</span>
+        </a>
+        <a href="creator-profile.html" class="avatar-link" aria-label="Hồ sơ của tôi">
+          <img src="https://i.pravatar.cc/150?img=12" alt="" class="user-avatar" data-user-avatar>
+        </a>
+        <button class="menu-toggle" aria-label="Mở menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content" id="main-content">
+    <div class="container">
+      <div class="page-header flex-between" style="flex-wrap:wrap;gap:1rem;">
+        <div>
+          <h1>Hồ sơ nghệ nhân</h1>
+          <p class="subtitle">Thông tin công khai của bạn trên Hành trình văn hóa</p>
+        </div>
+        <a href="creator-dashboard.html" class="btn btn-ghost">← Về bảng điều khiển</a>
+      </div>
+
+      <div id="profile-loading" class="state-box">
+        <div class="spinner"></div>
+        <p>Đang tải hồ sơ...</p>
+      </div>
+
+      <div id="profile-error" class="hidden">
+        <div class="state-box">
+          <div class="icon" aria-hidden="true">⚠️</div>
+          <h2>Không tải được hồ sơ</h2>
+          <p id="profile-error-message">Dữ liệu hồ sơ chưa sẵn sàng. Vui lòng thử lại.</p>
+          <div class="state-actions">
+            <button type="button" class="btn btn-primary" id="retry-btn">Thử lại</button>
+            <a href="creator-dashboard.html" class="btn btn-ghost">Về bảng điều khiển</a>
+          </div>
+        </div>
+      </div>
+
+      <div id="profile-content" class="hidden">
+        <section class="card profile-hero mb-3" aria-labelledby="hero-name">
+          <div class="profile-cover" aria-hidden="true"></div>
+          <div class="profile-body">
+            <div class="profile-top">
+              <img id="hero-avatar" class="profile-avatar-lg" src="https://i.pravatar.cc/150?img=12" alt="">
+              <div class="profile-identity">
+                <h2 id="hero-name">Đang tải...</h2>
+                <p class="text-muted" id="hero-region"></p>
+                <div class="profile-meta">
+                  <span class="badge badge-success" id="hero-status">Đang hoạt động</span>
+                  <span id="hero-joined"></span>
+                </div>
+              </div>
+              <div class="profile-stats" aria-label="Thống kê hồ sơ">
+                <div class="stat">
+                  <strong id="stat-stories">—</strong>
+                  <span>Câu chuyện</span>
+                </div>
+                <div class="stat">
+                  <strong id="stat-events">—</strong>
+                  <span>Sự kiện</span>
+                </div>
+                <div class="stat">
+                  <strong id="stat-followers">—</strong>
+                  <span>Người theo dõi</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <form id="profile-form" class="card" style="padding:1.5rem;" novalidate>
+          <h2 class="form-section-title">Thông tin hồ sơ</h2>
+          <p class="form-hint mb-2">Thông tin này hiển thị với người khám phá và biên tập viên trên Hành trình văn hóa.</p>
+
+          <div id="form-alert" class="hidden" role="status" aria-live="polite"></div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="name">Tên hiển thị *</label>
+              <input type="text" id="name" class="form-control" required maxlength="60" autocomplete="name">
+              <div class="form-error">Tên hiển thị cần ít nhất 3 ký tự.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="region">Khu vực *</label>
+              <select id="region" class="form-control" required>
+                <option value="">— Chọn khu vực —</option>
+                <option value="Hà Nội">Hà Nội</option>
+                <option value="Huế">Huế</option>
+                <option value="Phú Thọ">Phú Thọ</option>
+                <option value="Đà Nẵng">Đà Nẵng</option>
+                <option value="Quảng Nam">Quảng Nam</option>
+                <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
+                <option value="Cần Thơ">Cần Thơ</option>
+                <option value="Khác">Khác</option>
+              </select>
+              <div class="form-error">Vui lòng chọn khu vực hoạt động.</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email đăng nhập</label>
+            <input type="email" id="email" class="form-control" disabled aria-describedby="email-hint">
+            <p class="form-hint" id="email-hint">Email dùng để đăng nhập và không thể thay đổi tại đây.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="bio">Giới thiệu *</label>
+            <textarea id="bio" class="form-control" rows="5" maxlength="300" required
+                      aria-describedby="bio-hint bio-counter"></textarea>
+            <div class="form-error">Vui lòng giới thiệu ít nhất 20 ký tự.</div>
+            <p class="form-hint" id="bio-hint">Nêu ngắn gọn lĩnh vực chuyên môn và vùng văn hóa bạn gắn bó.</p>
+            <div class="char-counter" id="bio-counter">0/300</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="avatar">URL ảnh đại diện</label>
+            <div class="avatar-edit-row">
+              <img class="avatar-preview" id="avatar-preview" src="https://i.pravatar.cc/150?img=12" alt="Xem trước ảnh đại diện">
+              <input type="url" id="avatar" class="form-control" placeholder="https://..." aria-describedby="avatar-hint">
+            </div>
+            <div class="form-error">URL ảnh phải bắt đầu bằng http:// hoặc https://.</div>
+            <p class="form-hint" id="avatar-hint">Để trống để giữ ảnh hiện tại.</p>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+            <button type="button" class="btn btn-ghost" id="reset-btn">Hoàn tác</button>
+            <a href="creator-dashboard.html" class="btn btn-ghost">Hủy</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 CultureTrail – BTL CSE122</div>
+    </div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    const CREATOR_ID = getActiveCreatorId();
+
+    const loadingEl = document.getElementById('profile-loading');
+    const errorEl = document.getElementById('profile-error');
+    const errorMessageEl = document.getElementById('profile-error-message');
+    const contentEl = document.getElementById('profile-content');
+    const form = document.getElementById('profile-form');
+    const alertBox = document.getElementById('form-alert');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    const nameInput = document.getElementById('name');
+    const regionInput = document.getElementById('region');
+    const emailInput = document.getElementById('email');
+    const bioInput = document.getElementById('bio');
+    const avatarInput = document.getElementById('avatar');
+    const avatarPreview = document.getElementById('avatar-preview');
+    const bioCounter = document.getElementById('bio-counter');
+
+    let saved = null;
+    let currentUser = API.getCurrentUser();
+    let stats = { stories: [], events: [] };
+
+    function updateBioCounter() {
+      const length = bioInput.value.length;
+      bioCounter.textContent = `${length}/300`;
+      bioCounter.classList.toggle('limit', length >= 280);
+    }
+
+    function updateAvatarPreview(value) {
+      const fallback = (saved && saved.avatar) || DEFAULT_AVATAR;
+      avatarPreview.onerror = () => {
+        avatarPreview.onerror = null;
+        avatarPreview.src = DEFAULT_AVATAR;
+      };
+      avatarPreview.src = value && isValidHttpUrl(value) ? value : fallback;
+    }
+
+    function renderHero(creator, user) {
+      const status = creator.status || 'active';
+      document.getElementById('hero-avatar').src = creator.avatar || DEFAULT_AVATAR;
+      document.getElementById('hero-avatar').alt = `Ảnh đại diện của ${creator.name}`;
+      document.getElementById('hero-name').textContent = creator.name;
+      document.getElementById('hero-region').textContent =
+        `Nghệ nhân${creator.region ? ' · ' + creator.region : ''}`;
+      document.getElementById('hero-joined').textContent =
+        `Thành viên từ ${formatDate(creator.joinedAt)}`;
+      const statusBadge = document.getElementById('hero-status');
+      statusBadge.textContent = statusLabel(status);
+      statusBadge.className = `badge ${statusBadgeClass(status)}`;
+
+      document.getElementById('stat-stories').textContent = stats.stories.length.toLocaleString('vi-VN');
+      document.getElementById('stat-events').textContent = stats.events.length.toLocaleString('vi-VN');
+      document.getElementById('stat-followers').textContent =
+        Number(creator.followers || 0).toLocaleString('vi-VN');
+
+      emailInput.value = user.email || 'Chưa có email';
+    }
+
+    function fillForm() {
+      nameInput.value = saved.name;
+      regionInput.value = saved.region;
+      bioInput.value = saved.bio;
+      avatarInput.value = saved.avatar;
+      updateBioCounter();
+      updateAvatarPreview(saved.avatar);
+    }
+
+    function showAlert(type, message) {
+      alertBox.innerHTML = `<div class="alert alert-${type}">${escapeHtml(message)}</div>`;
+      alertBox.classList.remove('hidden');
+    }
+
+    function hideAlert() {
+      alertBox.classList.add('hidden');
+      alertBox.innerHTML = '';
+    }
+
+    async function load() {
+      loadingEl.classList.remove('hidden');
+      contentEl.classList.add('hidden');
+      errorEl.classList.add('hidden');
+      hideAlert();
+
+      try {
+        const creator = await API.getCreator(CREATOR_ID);
+        if (!creator) {
+          const isLoadError = Boolean(API.getLoadError('creators.json'));
+          throw new Error(isLoadError ? 'load' : 'missing');
+        }
+
+        const [users, stories, events] = await Promise.all([
+          API.getUsers(),
+          API.getStories(),
+          API.getEvents()
+        ]);
+        const user = users.find(u => u.id === CREATOR_ID) || {};
+
+        stats.stories = stories.filter(s => s.creatorId === CREATOR_ID);
+        stats.events = events.filter(e => e.creatorId === CREATOR_ID);
+        saved = {
+          name: creator.name || user.name || '',
+          bio: creator.bio || '',
+          region: creator.region || '',
+          avatar: creator.avatar || ''
+        };
+
+        renderHero(creator, user);
+        fillForm();
+        loadingEl.classList.add('hidden');
+        contentEl.classList.remove('hidden');
+      } catch (err) {
+        loadingEl.classList.add('hidden');
+        errorEl.classList.remove('hidden');
+        errorMessageEl.textContent = err.message === 'missing'
+          ? 'Tài khoản này chưa có hồ sơ nghệ nhân. Hãy quay lại dashboard hoặc đăng ký lại với vai trò nghệ nhân.'
+          : 'Không tải được dữ liệu hồ sơ. Kiểm tra kết nối rồi thử lại.';
+      }
+    }
+
+    function validateProfile() {
+      let valid = true;
+      const name = nameInput.value.trim();
+      const bio = bioInput.value.trim();
+      const avatarUrl = avatarInput.value.trim();
+
+      if (name.length < 3) {
+        setFieldError(nameInput, 'Tên hiển thị cần ít nhất 3 ký tự.');
+        valid = false;
+      } else {
+        clearFieldError(nameInput);
+      }
+
+      if (!regionInput.value) {
+        setFieldError(regionInput, 'Vui lòng chọn khu vực hoạt động.');
+        valid = false;
+      } else {
+        clearFieldError(regionInput);
+      }
+
+      if (bio.length < 20) {
+        setFieldError(bioInput, 'Vui lòng giới thiệu ít nhất 20 ký tự.');
+        valid = false;
+      } else if (bio.length > 300) {
+        setFieldError(bioInput, 'Phần giới thiệu không được vượt quá 300 ký tự.');
+        valid = false;
+      } else {
+        clearFieldError(bioInput);
+      }
+
+      if (avatarUrl && !isValidHttpUrl(avatarUrl)) {
+        setFieldError(avatarInput, 'URL ảnh không hợp lệ. Dùng địa chỉ bắt đầu bằng http:// hoặc https://.');
+        valid = false;
+      } else {
+        clearFieldError(avatarInput);
+      }
+
+      if (!valid) {
+        form.querySelector('.is-invalid')?.focus();
+      }
+      return valid;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAlert();
+      if (!validateProfile()) return;
+
+      const updates = {
+        name: nameInput.value.trim(),
+        region: regionInput.value,
+        bio: bioInput.value.trim(),
+        avatar: avatarInput.value.trim() || saved.avatar
+      };
+
+      setLoading(submitBtn, true, 'Đang lưu...');
+      try {
+        const updated = await API.updateCreator(CREATOR_ID, updates);
+        if (!updated) throw new Error('Không tìm thấy hồ sơ.');
+
+        await API.updateUser(CREATOR_ID, { name: updated.name, avatar: updated.avatar });
+
+        if (currentUser && currentUser.id === CREATOR_ID) {
+          currentUser = { ...currentUser, name: updated.name, avatar: updated.avatar };
+          API.setCurrentUser(currentUser);
+        }
+
+        saved = {
+          name: updated.name,
+          bio: updated.bio,
+          region: updated.region,
+          avatar: updated.avatar
+        };
+        fillForm();
+        renderHero(updated, { email: emailInput.value });
+        document.querySelectorAll('[data-user-avatar]').forEach(img => {
+          img.src = updated.avatar || DEFAULT_AVATAR;
+          img.alt = `Ảnh đại diện của ${updated.name}`;
+        });
+
+        showAlert('success', 'Đã lưu hồ sơ. Thay đổi của bạn đã được cập nhật công khai.');
+        showToast('Đã lưu hồ sơ nghệ nhân.', 'success');
+      } catch (err) {
+        showAlert('error', 'Không thể lưu hồ sơ lúc này. Vui lòng thử lại.');
+        showToast('Lưu hồ sơ thất bại.', 'error');
+      } finally {
+        setLoading(submitBtn, false);
+      }
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      if (!saved) return;
+      fillForm();
+      form.querySelectorAll('.is-invalid').forEach(clearFieldError);
+      hideAlert();
+      nameInput.focus();
+    });
+
+    bioInput.addEventListener('input', updateBioCounter);
+    avatarInput.addEventListener('input', () => updateAvatarPreview(avatarInput.value.trim()));
+
+    document.getElementById('retry-btn').addEventListener('click', load);
+
+    load();
+  </script>
+</body>
+</html>
