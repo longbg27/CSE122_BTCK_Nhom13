@@ -7,7 +7,7 @@
 
 ## 1. Giới thiệu
 
-CultureTrail là nền tảng khám phá văn hóa địa phương theo câu chuyện. Người dùng có thể:
+Hành trình văn hóa là nền tảng khám phá văn hóa địa phương theo câu chuyện. Người dùng có thể:
 
 - Đọc câu chuyện gắn với địa điểm
 - Tạo tuyến khám phá (Trail) cá nhân (có AI hỗ trợ)
