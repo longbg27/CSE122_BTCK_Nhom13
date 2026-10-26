@@ -1,0 +1,202 @@
+[
+  {
+    "id": "place-001",
+    "name": "Hồ Hoàn Kiếm",
+    "description": "Biểu tượng của Hà Nội, gắn liền với truyền thuyết Rùa thần và gươm báu.",
+    "address": "Hoàn Kiếm, Hà Nội",
+    "region": "Hà Nội",
+    "latitude": 21.0285,
+    "longitude": 105.8542,
+    "image": "../assets/images/ho-guom.jpeg",
+    "storyCount": 3,
+    "tags": [
+      "di tích",
+      "huyền thoại",
+      "Hà Nội"
+    ]
+  },
+  {
+    "id": "place-002",
+    "name": "Làng nghề nón lá Tây Hồ – Huế",
+    "description": "Nơi sản xuất nón bài thơ nổi tiếng của cố đô Huế.",
+    "address": "Phường Tây Hồ, TP. Huế",
+    "region": "Thừa Thiên Huế",
+    "latitude": 16.4637,
+    "longitude": 107.5909,
+    "image": "https://statics.vinpearl.com/non-bai-tho-hue-3_1630895844.jpg",
+    "storyCount": 1,
+    "tags": [
+      "làng nghề",
+      "thủ công",
+      "Huế"
+    ]
+  },
+  {
+    "id": "place-003",
+    "name": "Đền Hùng",
+    "description": "Khu di tích lịch sử quốc gia đặc biệt, nơi thờ các vua Hùng.",
+    "address": "Xã Hy Cương, TP. Việt Trì, Phú Thọ",
+    "region": "Phú Thọ",
+    "latitude": 21.3856,
+    "longitude": 105.3167,
+    "image": "https://statics.vinpearl.com/le-hoi-den-hung-4_1677852138.jpg",
+    "storyCount": 1,
+    "tags": [
+      "di tích",
+      "tín ngưỡng",
+      "Phú Thọ"
+    ]
+  },
+  {
+    "id": "place-004",
+    "name": "Làng gốm Bát Tràng",
+    "description": "Làng nghề gốm sứ truyền thống hơn 700 năm tuổi.",
+    "address": "Xã Bát Tràng, huyện Gia Lâm, Hà Nội",
+    "region": "Hà Nội",
+    "latitude": 20.9756,
+    "longitude": 105.9153,
+    "image": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800",
+    "storyCount": 1,
+    "tags": [
+      "làng nghề",
+      "gốm sứ",
+      "Hà Nội"
+    ]
+  },
+  {
+    "id": "place-005",
+    "name": "Văn Miếu – Quốc Tử Giám",
+    "description": "Trường đại học đầu tiên của Việt Nam, nơi lưu giữ 82 bia tiến sĩ – biểu tượng của truyền thống hiếu học.",
+    "address": "58 Quán Thánh, Ba Đình, Hà Nội",
+    "region": "Hà Nội",
+    "latitude": 21.0275,
+    "longitude": 105.8355,
+    "image": "../assets/images/van-mieu.jpg",
+    "emoji": "🏛️",
+    "storyCount": 0,
+    "tags": [
+      "di tích",
+      "giáo dục",
+      "Hà Nội"
+    ]
+  },
+  {
+    "id": "place-006",
+    "name": "Hoàng thành Thăng Long",
+    "description": "Di sản thế giới UNESCO, trung tâm quyền lực của nhiều triều đại phong kiến suốt hơn 1000 năm.",
+    "address": "19C Hoàng Diệu, Ba Đình, Hà Nội",
+    "region": "Hà Nội",
+    "latitude": 21.0351,
+    "longitude": 105.8404,
+    "image": "../assets/images/hoang-thanh-thang-long.jpg",
+    "emoji": "🏯",
+    "storyCount": 0,
+    "tags": [
+      "di sản",
+      "lịch sử",
+      "Hà Nội"
+    ]
+  },
+  {
+    "id": "place-007",
+    "name": "Đại Nội Huế",
+    "description": "Quần thể cung điện của triều Nguyễn bên bờ sông Hương, tiêu biểu cho kiến trúc cung đình Việt Nam.",
+    "address": "Phú Hậu, Thành phố Huế",
+    "region": "Huế",
+    "latitude": 16.4698,
+    "longitude": 107.5786,
+    "image": "../assets/images/dai-noi-hue.jpg",
+    "emoji": "👑",
+    "storyCount": 0,
+    "tags": [
+      "di sản",
+      "cung đình",
+      "Huế"
+    ]
+  },
+  {
+    "id": "place-008",
+    "name": "Phố cổ Hội An",
+    "description": "Đô thị cổ giữ gần như nguyên vẹn với nhà cổ, hội quán, đèn lồng và Chùa Cầu nổi tiếng.",
+    "address": "Hội An, Quảng Nam",
+    "region": "Quảng Nam",
+    "latitude": 15.8801,
+    "longitude": 108.338,
+    "image": "../assets/images/pho-co-hoi-an.jpg",
+    "emoji": "🏮",
+    "storyCount": 0,
+    "tags": [
+      "di sản",
+      "phố cổ",
+      "Quảng Nam"
+    ]
+  },
+  {
+    "id": "place-009",
+    "name": "Vịnh Hạ Long",
+    "description": "Kỳ quan thiên nhiên với hàng nghìn đảo đá vôi, gắn với truyền thuyết rồng mẹ và đàn rồng con.",
+    "address": "Hạ Long, Quảng Ninh",
+    "region": "Quảng Ninh",
+    "latitude": 20.9101,
+    "longitude": 107.1839,
+    "image": "../assets/images/vinh-ha-long.jpg",
+    "emoji": "⛵",
+    "storyCount": 0,
+    "tags": [
+      "thiên nhiên",
+      "huyền thoại",
+      "Quảng Ninh"
+    ]
+  },
+  {
+    "id": "place-010",
+    "name": "Thánh địa Mỹ Sơn",
+    "description": "Cụm đền tháp Chăm Pa cổ từ thế kỷ IV, di sản văn hóa thế giới giữa thung lũng Quảng Nam.",
+    "address": "Duy Phú, Duy Xuyên, Quảng Nam",
+    "region": "Quảng Nam",
+    "latitude": 15.7643,
+    "longitude": 108.1241,
+    "image": "../assets/images/my-son.jpg",
+    "emoji": "🛕",
+    "storyCount": 0,
+    "tags": [
+      "di sản",
+      "Chăm Pa",
+      "Quảng Nam"
+    ]
+  },
+  {
+    "id": "place-011",
+    "name": "Sa Pa",
+    "description": "Vùng núi với ruộng bậc thang và chợ phiên, nơi đồng bào H'Mông, Dao, Tày giữ gìn thổ cẩm và lễ hội riêng.",
+    "address": "Sa Pa, Lào Cai",
+    "region": "Lào Cai",
+    "latitude": 22.3364,
+    "longitude": 103.8438,
+    "image": "../assets/images/sa-pa.jpg",
+    "emoji": "⛰️",
+    "storyCount": 0,
+    "tags": [
+      "dân tộc",
+      "thổ cẩm",
+      "Lào Cai"
+    ]
+  },
+  {
+    "id": "place-012",
+    "name": "Chùa Một Cột",
+    "description": "Ngôi chùa độc đáo có kiến trúc hình đóa sen nở trên mặt nước, xây từ thời vua Lý Thái Tông.",
+    "address": "Chùa Một Cột, Ba Đình, Hà Nội",
+    "region": "Hà Nội",
+    "latitude": 21.0359,
+    "longitude": 105.8335,
+    "image": "../assets/images/chua-mot-cot.jpg",
+    "emoji": "🪷",
+    "storyCount": 0,
+    "tags": [
+      "di tích",
+      "chùa",
+      "Hà Nội"
+    ]
+  }
+]

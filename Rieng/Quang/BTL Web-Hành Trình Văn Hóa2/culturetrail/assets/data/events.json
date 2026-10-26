@@ -1,0 +1,44 @@
+[
+  {
+    "id": "event-001",
+    "title": "Ngày hội văn hóa Hồ Gươm 2026",
+    "description": "Sự kiện tái hiện truyền thuyết Rùa thần, biểu diễn ca trù và trải nghiệm làm nón lá.",
+    "placeId": "place-001",
+    "creatorId": "creator-001",
+    "startDate": "2026-04-15T08:00:00Z",
+    "endDate": "2026-04-16T21:00:00Z",
+    "status": "upcoming",
+    "capacity": 500,
+    "registered": 312,
+    "image": "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800",
+    "tags": ["lễ hội", "Hà Nội", "văn hóa"]
+  },
+  {
+    "id": "event-002",
+    "title": "Workshop làm nón lá truyền thống",
+    "description": "Học cách làm nón lá và nón bài thơ từ nghệ nhân Huế.",
+    "placeId": "place-002",
+    "creatorId": "creator-002",
+    "startDate": "2026-03-20T09:00:00Z",
+    "endDate": "2026-03-20T16:00:00Z",
+    "status": "upcoming",
+    "capacity": 30,
+    "registered": 28,
+    "image": "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800",
+    "tags": ["workshop", "thủ công", "Huế"]
+  },
+  {
+    "id": "event-003",
+    "title": "Giỗ Tổ Hùng Vương tại đền Hùng",
+    "description": "Lễ hội truyền thống tưởng nhớ các vua Hùng.",
+    "placeId": "place-003",
+    "creatorId": "creator-001",
+    "startDate": "2026-04-28T06:00:00Z",
+    "endDate": "2026-04-28T18:00:00Z",
+    "status": "upcoming",
+    "capacity": 2000,
+    "registered": 1450,
+    "image": "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800",
+    "tags": ["lễ hội", "tín ngưỡng", "Phú Thọ"]
+  }
+]

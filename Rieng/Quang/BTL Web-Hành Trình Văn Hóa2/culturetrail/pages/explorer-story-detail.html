@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết câu chuyện - Hành Trình Văn Hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">HT</span>
+        Hành Trình Văn Hóa
+      </a>
+      <nav class="nav-main">
+        <a href="index.html">Trang chủ</a>
+        <a href="explorer-story-discovery.html">Khám phá</a>
+        <a href="explorer-my-trail.html">Trail của tôi</a>
+        <a href="profile.html">Hồ sơ</a>
+
+      </nav>
+      <div class="header-actions">
+        <a href="login.html" class="btn btn-outline btn-sm" id="auth-btn">Đăng nhập</a>
+        <img src="" alt="User" class="user-avatar hidden" id="user-avatar">
+        <button class="menu-toggle" aria-label="Menu">☰</button>
+      </div>
+    </div>
+  </header>
+  <main class="main-content">
+    <div class="container" style="max-width: 800px;">
+      <div id="content">
+        <div class="state-box">
+          <div class="spinner"></div>
+          <p>Đang tải...</p>
+        </div>
+      </div>
+      <section id="related" class="mt-3 hidden">
+        <h2 class="mb-2">Câu chuyện liên quan</h2>
+        <div id="related-list" class="grid grid-2"></div>
+      </section>
+      <div class="ai-panel" id="ai-panel" style="display: none;">
+        <div class="ai-panel-header">
+          <span class="ai-icon">AI</span>
+        </div>
+        <strong>AI Story Summarizer</strong>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

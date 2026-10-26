@@ -1,0 +1,47 @@
+[
+  {
+    "id": "user-001",
+    "name": "Phạm Minh Anh",
+    "email": "minhanh@example.com",
+    "role": "explorer",
+    "avatar": "https://i.pravatar.cc/150?img=47",
+    "joinedAt": "2025-05-10T00:00:00Z",
+    "status": "active"
+  },
+  {
+    "id": "creator-001",
+    "name": "Nguyễn Văn Minh",
+    "email": "minh.nguyen@example.com",
+    "role": "creator",
+    "avatar": "https://i.pravatar.cc/150?img=12",
+    "joinedAt": "2024-03-15T00:00:00Z",
+    "status": "active"
+  },
+  {
+    "id": "creator-002",
+    "name": "Trần Thị Lan",
+    "email": "lan.tran@example.com",
+    "role": "creator",
+    "avatar": "https://i.pravatar.cc/150?img=5",
+    "joinedAt": "2024-06-20T00:00:00Z",
+    "status": "active"
+  },
+  {
+    "id": "curator-001",
+    "name": "Hoàng Thị Mai",
+    "email": "mai.hoang@example.com",
+    "role": "curator",
+    "avatar": "https://i.pravatar.cc/150?img=20",
+    "joinedAt": "2024-01-05T00:00:00Z",
+    "status": "active"
+  },
+  {
+    "id": "admin-001",
+    "name": "Admin Hành Trình Văn Hóa",
+    "email": "admin@culturetrail.vn",
+    "role": "admin",
+    "avatar": "https://i.pravatar.cc/150?img=1",
+    "joinedAt": "2024-01-01T00:00:00Z",
+    "status": "active"
+  }
+]

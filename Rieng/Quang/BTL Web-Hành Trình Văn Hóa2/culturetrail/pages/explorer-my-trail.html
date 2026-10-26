@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trail của tôi – Hành Trình Văn Hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">HT</span>
+        Hành Trình Văn Hóa
+      </a>
+      <nav class="nav-main">
+        <a href="index.html">Trang chủ</a>
+        <a href="explorer-story-discovery.html">Khám phá</a>
+        <a href="explorer-my-trail.html" class="active">Trail của tôi</a>
+        <a href="profile.html">Hồ sơ</a>
+      </nav>
+      <div class="header-actions">
+        <button class="menu-toggle" aria-label="Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-header flex-between" style="flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1>Trail của tôi</h1>
+          <p class="subtitle">Quản lý các tuyến khám phá văn hóa cá nhân</p>
+        </div>
+        <button class="btn btn-primary" id="btn-open-ai">✨ Tạo Trail bằng AI</button>
+      </div>
+
+      <!-- AI Trail Generator Panel -->
+      <div class="ai-panel" id="ai-panel">
+        <div class="ai-panel-header">
+          <span class="ai-icon">AI</span>
+          <div>
+            <strong>AI Trail Generator</strong>
+            <p class="text-muted" style="font-size: 0.85rem; margin: 0;">Tạo tuyến khám phá theo chủ đề và thời gian</p>
+          </div>
+        </div>
+
+        <div id="ai-form">
+          <div class="grid grid-2" style="gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="ai-theme">Chủ đề</label>
+              <input type="text" id="ai-theme" class="form-control" placeholder="Ví dụ: huyền thoại, làng nghề, lễ hội...">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ai-duration">Thời gian</label>
+              <select id="ai-duration" class="form-control">
+                <option value="nửa ngày">Nửa ngày</option>
+                <option value="1 ngày" selected>1 ngày</option>
+                <option value="2 ngày">2 ngày</option>
+                <option value="3 ngày">3 ngày</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ai-region">Khu vực ưu tiên (tùy chọn)</label>
+            <input type="text" id="ai-region" class="form-control" placeholder="Hà Nội, Huế, Phú Thọ...">
+          </div>
+          <button class="btn btn-primary" id="btn-generate">Tạo tuyến ngay</button>
+        </div>
+
+        <div id="ai-loading" class="hidden">
+          <div class="spinner"></div>
+          <p class="text-center">AI đang phân tích dữ liệu và xây dựng tuyến...</p>
+        </div>
+
+        <div id="ai-result" class="hidden">
+          <div class="ai-result">
+            <h4 id="trail-title"></h4>
+            <p id="trail-desc" class="text-muted"></p>
+            <ul id="trail-stops" style="margin: 1rem 0; padding-left: 1.25rem;"></ul>
+            <p class="text-muted" style="font-size: 0.85rem;"><strong>Vì sao:</strong> <span id="trail-reason"></span></p>
+          </div>
+          <div class="ai-actions">
+            <button class="btn btn-primary btn-sm" id="btn-accept-trail">✓ Chấp nhận & Lưu</button>
+            <button class="btn btn-outline btn-sm" id="btn-edit-trail">✎ Chỉnh sửa</button>
+            <button class="btn btn-ghost btn-sm" id="btn-retry-trail">↻ Tạo lại</button>
+            <button class="btn btn-ghost btn-sm" id="btn-reject-trail">✕ Từ chối</button>
+          </div>
+        </div>
+
+        <div id="ai-fail" class="hidden">
+          <div class="alert alert-warning">Không đủ dữ liệu để đưa ra đề xuất phù hợp. Hãy thử chủ đề khác hoặc tạo thủ công.</div>
+          <div class="ai-actions">
+            <button class="btn btn-outline btn-sm" id="btn-retry-fail">↻ Thử lại</button>
+            <button class="btn btn-ghost btn-sm" id="btn-manual">Tạo thủ công</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trail list -->
+      <h2 class="mt-3 mb-2">Các trail đã lưu</h2>
+      <div id="trail-list">
+        <div class="state-box">
+          <div class="spinner"></div>
+          <p>Đang tải...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border: none; margin: 0; padding: 0;">
+        © 2026 Hành Trình Văn Hóa – BTL CSE122
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    let generatedTrail = null;
+
+    async function loadTrails() {
+      const container = document.getElementById('trail-list');
+      const trails = await API.getTrails();
+      if (trails.length === 0) {
+        container.innerHTML = `
+          <div class="state-box">
+            <div class="icon">🗺️</div>
+            <h3>Chưa có trail nào</h3>
+            <p>Hãy dùng AI để tạo tuyến khám phá đầu tiên của bạn.</p>
+          </div>`;
+        return;
+      }
+      const places = await API.getPlaces();
+      container.innerHTML = '<div class="grid grid-2">' + trails.map(t => {
+        const placeNames = (t.placeIds || []).map(id => {
+          const p = places.find(x => x.id === id);
+          return p ? p.name : id;
+        }).join(', ');
+        return `
+          <article class="card">
+            <div class="card-body">
+              <div class="flex-between mb-1">
+                <h3 class="card-title">${escapeHtml(t.title)}</h3>
+                <span class="badge badge-success">${escapeHtml(t.status)}</span>
+              </div>
+              <p class="card-text">${escapeHtml(t.description)}</p>
+              <div class="card-meta">
+                <span>⏱ ${escapeHtml(t.duration)}</span>
+                <span>🏷 ${escapeHtml(t.theme)}</span>
+                <span>📍 ${escapeHtml(placeNames)}</span>
+              </div>
+              <div class="mt-2 flex gap-1">
+                <a href="explorer-trail-detail.html?id=${t.id}" class="btn btn-outline btn-sm">Xem chi tiết</a>
+                <button class="btn btn-ghost btn-sm" onclick="deleteTrail('${t.id}')">Xóa</button>
+              </div>
+            </div>
+          </article>`;
+      }).join('') + '</div>';
+    }
+
+    async function deleteTrail(id) {
+      if (!confirm('Bạn có chắc muốn xóa trail này?')) return;
+      await API.deleteTrail(id);
+      showToast('Đã xóa trail.', 'success');
+      loadTrails();
+    }
+
+    // AI Generate
+    document.getElementById('btn-generate').addEventListener('click', async () => {
+      const theme = document.getElementById('ai-theme').value.trim();
+      if (!theme) {
+        showToast('Vui lòng nhập chủ đề.', 'error');
+        return;
+      }
+      const duration = document.getElementById('ai-duration').value;
+      const region = document.getElementById('ai-region').value.trim();
+
+      document.getElementById('ai-form').classList.add('hidden');
+      document.getElementById('ai-result').classList.add('hidden');
+      document.getElementById('ai-fail').classList.add('hidden');
+      document.getElementById('ai-loading').classList.remove('hidden');
+
+      await delay(1800 + Math.random() * 800);
+
+      if (Math.random() < 0.12) {
+        document.getElementById('ai-loading').classList.add('hidden');
+        document.getElementById('ai-fail').classList.remove('hidden');
+        return;
+      }
+
+      const places = await API.getPlaces();
+      const stories = await API.getStories();
+      const matchedPlaces = places.filter(p =>
+        !region || p.region.includes(region) || (p.tags || []).some(t => t.includes(theme) || t.includes(region))
+      ).slice(0, duration === 'nửa ngày' ? 1 : duration === '1 ngày' ? 2 : 3);
+
+      const usedPlaces = matchedPlaces.length ? matchedPlaces : places.slice(0, 2);
+      const usedStories = stories.filter(s => usedPlaces.some(p => p.id === s.placeId)).slice(0, 3);
+
+      generatedTrail = {
+        title: `Hành trình ${theme} – ${duration}`,
+        description: `Tuyến khám phá theo chủ đề "${theme}" trong ${duration}${region ? ', ưu tiên khu vực ' + region : ''}.`,
+        placeIds: usedPlaces.map(p => p.id),
+        storyIds: usedStories.map(s => s.id),
+        duration,
+        theme,
+        userId: 'user-001'
+      };
+
+      document.getElementById('trail-title').textContent = generatedTrail.title;
+      document.getElementById('trail-desc').textContent = generatedTrail.description;
+      document.getElementById('trail-stops').innerHTML = usedPlaces.map((p, i) =>
+        `<li><strong>Điểm ${i + 1}:</strong> ${escapeHtml(p.name)} – ${escapeHtml(p.description.slice(0, 80))}...</li>`
+      ).join('');
+      document.getElementById('trail-reason').textContent =
+        `AI chọn các địa điểm có tag liên quan đến "${theme}" và sắp xếp theo khoảng cách logic trong ${duration}.`;
+
+      document.getElementById('ai-loading').classList.add('hidden');
+      document.getElementById('ai-result').classList.remove('hidden');
+    });
+
+    document.getElementById('btn-accept-trail').addEventListener('click', async () => {
+      if (!generatedTrail) return;
+      await API.createTrail(generatedTrail);
+      showToast('Đã lưu trail thành công!', 'success');
+      document.getElementById('ai-result').classList.add('hidden');
+      document.getElementById('ai-form').classList.remove('hidden');
+      document.getElementById('ai-theme').value = '';
+      loadTrails();
+    });
+
+    document.getElementById('btn-retry-trail').addEventListener('click', () => {
+      document.getElementById('btn-generate').click();
+    });
+    document.getElementById('btn-retry-fail').addEventListener('click', () => {
+      document.getElementById('ai-fail').classList.add('hidden');
+      document.getElementById('ai-form').classList.remove('hidden');
+    });
+    document.getElementById('btn-reject-trail').addEventListener('click', () => {
+      document.getElementById('ai-result').classList.add('hidden');
+      document.getElementById('ai-form').classList.remove('hidden');
+      showToast('Đã từ chối đề xuất.', 'info');
+    });
+    document.getElementById('btn-manual').addEventListener('click', () => {
+      document.getElementById('ai-fail').classList.add('hidden');
+      document.getElementById('ai-form').classList.remove('hidden');
+      showToast('Bạn có thể tạo trail thủ công từ trang chi tiết địa điểm.', 'info');
+    });
+    document.getElementById('btn-edit-trail').addEventListener('click', () => {
+      document.getElementById('trail-title').contentEditable = true;
+      document.getElementById('trail-desc').contentEditable = true;
+      showToast('Bạn có thể chỉnh sửa tiêu đề và mô tả.', 'info');
+    });
+
+    document.getElementById('btn-open-ai').addEventListener('click', () => {
+      document.getElementById('ai-panel').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    loadTrails();
+  </script>
+</body>
+</html>
