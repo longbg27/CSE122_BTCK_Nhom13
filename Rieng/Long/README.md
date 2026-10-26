@@ -1,1 +1,0 @@
-BTR cua Long
