@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cài đặt hệ thống – Hành trình văn hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> CultureTrail</a>
+      <nav class="nav-main">
+        <a href="ad-bangdieukhien.html">Bộ điều khiển</a>
+        <a href="ad-qly-user.html">Người dùng</a>
+        <a href="ad-qly-tags.html">Tags</a>
+        <a href="ad-caidat.html" class="active">Cài đặt</a>
+      </nav>
+      <div class="header-actions"><button class="menu-toggle" aria-label="Menu">☰</button></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container" style="max-width:720px;">
+      <div class="page-header">
+        <h1>Cài đặt hệ thống</h1>
+        <p class="subtitle">Cấu hình toàn cục cho CultureTrail (mock admin)</p>
+      </div>
+
+      <div id="loading" class="state-box"><div class="spinner"></div><p>Đang tải...</p></div>
+      <div id="content" style="display:none;">
+        <form id="sys-form" class="card" style="padding:1.5rem;" novalidate>
+          <h3 class="mb-2">Thông tin nền tảng</h3>
+          <div class="form-group">
+            <label class="form-label" for="site-name">Tên hệ thống *</label>
+            <input type="text" id="site-name" class="form-control" required>
+            <div class="form-error">Bắt buộc.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="site-desc">Mô tả ngắn</label>
+            <textarea id="site-desc" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="contact-email">Email liên hệ</label>
+            <input type="email" id="contact-email" class="form-control" placeholder="support@culturetrail.vn">
+          </div>
+
+          <h3 class="mb-2 mt-3">Duyệt nội dung</h3>
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+              <input type="checkbox" id="require-review">
+              <span>Bắt buộc duyệt trước khi xuất bản câu chuyện</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+              <input type="checkbox" id="allow-register" checked>
+              <span>Cho phép đăng ký tài khoản mới</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="default-role">Vai trò mặc định khi đăng ký</label>
+            <select id="default-role" class="form-control">
+              <option value="explorer">Explorer</option>
+              <option value="creator">Creator</option>
+            </select>
+          </div>
+
+          <h3 class="mb-2 mt-3">AI & giới hạn</h3>
+          <div class="form-group">
+            <label class="form-label" for="ai-delay">Độ trễ mô phỏng AI (ms)</label>
+            <input type="number" id="ai-delay" class="form-control" min="500" max="5000" step="100">
+          </div>
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+              <input type="checkbox" id="ai-failure">
+              <span>Bật chế độ giả lập lỗi AI (để test failure/retry)</span>
+            </label>
+          </div>
+
+          <div class="flex gap-1" style="flex-wrap:wrap;">
+            <button type="submit" class="btn btn-primary">Lưu cấu hình</button>
+            <button type="button" class="btn btn-outline" id="btn-defaults">Khôi phục mặc định</button>
+          </div>
+        </form>
+
+        <div class="card mt-3" style="padding:1.5rem;">
+          <h3 class="mb-2">Bảo trì</h3>
+          <p class="text-muted mb-2">Xóa toàn bộ dữ liệu LocalStorage và tải lại seed JSON.</p>
+          <button type="button" class="btn btn-outline" id="btn-reset">Reset toàn bộ dữ liệu demo</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 CultureTrail</div></div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    const KEY = 'ct_system_settings';
+    const defaults = {
+      siteName: 'CultureTrail',
+      siteDesc: 'Khám phá di sản văn hóa Việt Nam qua câu chuyện và hành trình.',
+      contactEmail: 'support@culturetrail.vn',
+      requireReview: true,
+      allowRegister: true,
+      defaultRole: 'explorer',
+      aiDelay: 1500,
+      aiFailure: false
+    };
+
+    function load() {
+      try { return { ...defaults, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; }
+      catch { return { ...defaults }; }
+    }
+
+    function fill(s) {
+      document.getElementById('site-name').value = s.siteName;
+      document.getElementById('site-desc').value = s.siteDesc;
+      document.getElementById('contact-email').value = s.contactEmail;
+      document.getElementById('require-review').checked = !!s.requireReview;
+      document.getElementById('allow-register').checked = !!s.allowRegister;
+      document.getElementById('default-role').value = s.defaultRole;
+      document.getElementById('ai-delay').value = s.aiDelay;
+      document.getElementById('ai-failure').checked = !!s.aiFailure;
+    }
+
+    setTimeout(() => {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      fill(load());
+    }, 300);
+
+    document.getElementById('sys-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('site-name');
+      if (!name.value.trim()) {
+        name.classList.add('is-invalid');
+        showToast('Vui lòng nhập tên hệ thống.', 'error');
+        return;
+      }
+      name.classList.remove('is-invalid');
+      const s = {
+        siteName: name.value.trim(),
+        siteDesc: document.getElementById('site-desc').value.trim(),
+        contactEmail: document.getElementById('contact-email').value.trim(),
+        requireReview: document.getElementById('require-review').checked,
+        allowRegister: document.getElementById('allow-register').checked,
+        defaultRole: document.getElementById('default-role').value,
+        aiDelay: Number(document.getElementById('ai-delay').value) || 1500,
+        aiFailure: document.getElementById('ai-failure').checked
+      };
+      localStorage.setItem(KEY, JSON.stringify(s));
+      showToast('Đã lưu cấu hình hệ thống.', 'success');
+    });
+
+    document.getElementById('btn-defaults').addEventListener('click', () => {
+      localStorage.removeItem(KEY);
+      fill(defaults);
+      showToast('Đã khôi phục mặc định.', 'info');
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      if (!confirm('Xóa toàn bộ dữ liệu demo trên trình duyệt này?')) return;
+      API.resetAll();
+      localStorage.removeItem(KEY);
+      showToast('Đã reset. Đang tải lại...', 'success');
+      setTimeout(() => location.reload(), 800);
+    });
+  </script>
+</body>
+</html>

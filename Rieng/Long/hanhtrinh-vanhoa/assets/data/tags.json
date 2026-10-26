@@ -1,0 +1,17 @@
+[
+  { "id": "tag-001", "name": "huyền thoại", "category": "chủ đề", "usageCount": 15 },
+  { "id": "tag-002", "name": "Hà Nội", "category": "địa danh", "usageCount": 28 },
+  { "id": "tag-003", "name": "lịch sử", "category": "chủ đề", "usageCount": 42 },
+  { "id": "tag-004", "name": "thủ công", "category": "chủ đề", "usageCount": 19 },
+  { "id": "tag-005", "name": "Huế", "category": "địa danh", "usageCount": 12 },
+  { "id": "tag-006", "name": "nghệ thuật", "category": "chủ đề", "usageCount": 23 },
+  { "id": "tag-007", "name": "lễ hội", "category": "chủ đề", "usageCount": 17 },
+  { "id": "tag-008", "name": "Phú Thọ", "category": "địa danh", "usageCount": 8 },
+  { "id": "tag-009", "name": "tín ngưỡng", "category": "chủ đề", "usageCount": 14 },
+  { "id": "tag-010", "name": "gốm sứ", "category": "chủ đề", "usageCount": 9 },
+  { "id": "tag-011", "name": "Bát Tràng", "category": "địa danh", "usageCount": 7 },
+  { "id": "tag-012", "name": "âm nhạc", "category": "chủ đề", "usageCount": 11 },
+  { "id": "tag-013", "name": "di sản", "category": "chủ đề", "usageCount": 16 },
+  { "id": "tag-014", "name": "ca trù", "category": "chủ đề", "usageCount": 5 },
+  { "id": "tag-015", "name": "UNESCO", "category": "chủ đề", "usageCount": 6 }
+]
