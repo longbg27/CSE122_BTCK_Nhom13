@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duyệt nội dung – Hành trình văn hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> Hành Trình Văn Hóa</a>
+      <nav class="nav-main">
+        <a href="curator-duyet-ndung.html" class="active">Duyệt nội dung</a>
+        <a href="curator-qly-bosuutap.html">Bộ sưu tập</a>
+        <a href="curator-ndung-bdo.html">Bản đồ nội dung</a>
+        <a href="ad-bangdieukhien.html">Bảng điều khiển</a>
+      </nav>
+      <div class="header-actions"><button class="menu-toggle" aria-label="Menu">☰</button></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-header">
+        <h1>Duyệt nội dung</h1>
+        <p class="subtitle">Xem xét và phê duyệt câu chuyện từ nghệ nhân</p>
+      </div>
+
+      <div class="filter-bar">
+        <select id="filter" class="form-control" style="max-width:180px;">
+          <option value="pending">Chờ duyệt</option>
+          <option value="published">Đã xuất bản</option>
+          <option value="all">Tất cả</option>
+        </select>
+      </div>
+
+      <div id="list">
+        <div class="state-box"><div class="spinner"></div><p>Đang tải...</p></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 CultureTrail</div></div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    let all = [];
+    async function load() {
+      all = await API.getStories();
+      render();
+      document.getElementById('filter').addEventListener('change', render);
+    }
+    function render() {
+      const f = document.getElementById('filter').value;
+      let list = all;
+      if (f === 'pending') list = all.filter(s => s.status === 'pending');
+      else if (f === 'published') list = all.filter(s => s.status === 'published');
+
+      const container = document.getElementById('list');
+      if (!list.length) {
+        container.innerHTML = '<div class="state-box"><div class="icon">✅</div><h3>Không có nội dung nào</h3><p>Hàng đợi trống.</p></div>';
+        return;
+      }
+      container.innerHTML = list.map(s => `
+        <article class="card mb-2">
+          <div class="card-body">
+            <div class="flex-between" style="flex-wrap:wrap;gap:0.5rem;">
+              <div>
+                <span class="badge ${statusBadgeClass(s.status)}">${statusLabel(s.status)}</span>
+                <h3 class="card-title mt-1">${escapeHtml(s.title)}</h3>
+                <p class="card-text">${escapeHtml(s.summary)}</p>
+                <div class="card-meta">
+                  <span>📅 ${formatDate(s.createdAt)}</span>
+                  <span>${(s.tags||[]).slice(0,3).map(t=>`<span class="badge badge-primary">${escapeHtml(t)}</span>`).join(' ')}</span>
+                </div>
+              </div>
+              <div class="flex gap-1">
+                ${s.status === 'pending' ? `
+                  <button class="btn btn-primary btn-sm" onclick="approve('${s.id}')">✓ Duyệt</button>
+                  <button class="btn btn-outline btn-sm" onclick="reject('${s.id}')">✕ Từ chối</button>
+                ` : ''}
+                <a href="explorer-story-detail.html?id=${s.id}" class="btn btn-ghost btn-sm" target="_blank">Xem</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+    async function approve(id) {
+      await API.updateStory(id, { status: 'published' });
+      showToast('Đã duyệt và xuất bản.', 'success');
+      load();
+    }
+    async function reject(id) {
+      if (!confirm('Từ chối nội dung này?')) return;
+      await API.updateStory(id, { status: 'rejected' });
+      showToast('Đã từ chối.', 'info');
+      load();
+    }
+    load();
+  </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng điều khiển – Hành trình văn hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> Hành Trình Văn Hóa</a>
+      <nav class="nav-main">
+        <a href="ad-bangdieukhien.html" class="active">Bảng điều khiển</a>
+        <a href="ad-qly-user.html">Người dùng</a>
+        <a href="ad-qly-tags.html">Tags</a>
+        <a href="curator-duyet-ndung.html">Duyệt nội dung</a>
+      </nav>
+      <div class="header-actions"><button class="menu-toggle" aria-label="Menu">☰</button></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-header">
+        <h1>Bảng điều khiển văn hóa</h1>
+        <p class="subtitle">Tổng quan hệ thống Hành trình văn hóa</p>
+      </div>
+
+      <div class="grid grid-4 mb-3">
+        <div class="card" style="padding:1.25rem;text-align:center;">
+          <div style="font-size:1.75rem;font-weight:700;color:var(--color-primary);" id="s-stories">—</div>
+          <div class="text-muted">Câu chuyện</div>
+        </div>
+        <div class="card" style="padding:1.25rem;text-align:center;">
+          <div style="font-size:1.75rem;font-weight:700;color:var(--color-secondary);" id="s-places">—</div>
+          <div class="text-muted">Địa điểm</div>
+        </div>
+        <div class="card" style="padding:1.25rem;text-align:center;">
+          <div style="font-size:1.75rem;font-weight:700;color:var(--color-accent);" id="s-users">—</div>
+          <div class="text-muted">Người dùng</div>
+        </div>
+        <div class="card" style="padding:1.25rem;text-align:center;">
+          <div style="font-size:1.75rem;font-weight:700;" id="s-pending">—</div>
+          <div class="text-muted">Chờ duyệt</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-body">
+            <h3 class="mb-2">Trạng thái câu chuyện</h3>
+            <div id="status-chart">
+              <div class="state-box"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <h3 class="mb-2">Top tags</h3>
+            <div id="top-tags">
+              <div class="state-box"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="mt-3 mb-2">Hoạt động gần đây</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Loại</th><th>Nội dung</th><th>Trạng thái</th><th>Thời gian</th></tr></thead>
+          <tbody id="activity"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 CultureTrail</div></div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    async function load() {
+      const [stories, places, users, tags] = await Promise.all([
+        API.getStories(), API.getPlaces(), API.getUsers(), API.getTags()
+      ]);
+      document.getElementById('s-stories').textContent = stories.length;
+      document.getElementById('s-places').textContent = places.length;
+      document.getElementById('s-users').textContent = users.length;
+      document.getElementById('s-pending').textContent = stories.filter(s => s.status === 'pending').length;
+
+      const published = stories.filter(s => s.status === 'published').length;
+      const pending = stories.filter(s => s.status === 'pending').length;
+      const other = stories.length - published - pending;
+      document.getElementById('status-chart').innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:0.75rem;">
+          <div><span class="badge badge-success">Đã xuất bản</span> ${published}</div>
+          <div style="background:#e8e0d5;border-radius:4px;height:12px;"><div style="background:var(--color-success);height:100%;width:${stories.length?published/stories.length*100:0}%;border-radius:4px;"></div></div>
+          <div><span class="badge badge-warning">Chờ duyệt</span> ${pending}</div>
+          <div style="background:#e8e0d5;border-radius:4px;height:12px;"><div style="background:var(--color-warning);height:100%;width:${stories.length?pending/stories.length*100:0}%;border-radius:4px;"></div></div>
+          <div><span class="badge">Khác</span> ${other}</div>
+        </div>
+      `;
+
+      const top = tags.sort((a,b) => b.usageCount - a.usageCount).slice(0, 8);
+      document.getElementById('top-tags').innerHTML = top.map(t =>
+        `<div class="flex-between mb-1"><span>${escapeHtml(t.name)}</span><span class="badge">${t.usageCount}</span></div>`
+      ).join('');
+
+      document.getElementById('activity').innerHTML = stories.slice(0, 6).map(s => `
+        <tr>
+          <td>Câu chuyện</td>
+          <td>${escapeHtml(s.title)}</td>
+          <td><span class="badge ${statusBadgeClass(s.status)}">${statusLabel(s.status)}</span></td>
+          <td>${formatDate(s.updatedAt || s.createdAt)}</td>
+        </tr>
+      `).join('');
+    }
+    load();
+  </script>
+</body>
+</html>

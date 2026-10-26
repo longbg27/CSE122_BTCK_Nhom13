@@ -1,0 +1,66 @@
+[
+  {
+    "id": "place-001",
+    "name": "Hồ Hoàn Kiếm",
+    "description": "Biểu tượng của Hà Nội, gắn liền với truyền thuyết Rùa thần và gươm báu.",
+    "address": "Hoàn Kiếm, Hà Nội",
+    "region": "Hà Nội",
+    "latitude": 21.0285,
+    "longitude": 105.8542,
+    "image": "../assets/images/ho-guom.jpeg",
+    "storyCount": 3,
+    "tags": [
+      "di tích",
+      "huyền thoại",
+      "Hà Nội"
+    ]
+  },
+  {
+    "id": "place-002",
+    "name": "Làng nghề nón lá Tây Hồ – Huế",
+    "description": "Nơi sản xuất nón bài thơ nổi tiếng của cố đô Huế.",
+    "address": "Phường Tây Hồ, TP. Huế",
+    "region": "Thừa Thiên Huế",
+    "latitude": 16.4637,
+    "longitude": 107.5909,
+    "image": "../assets/images/dai-noi-hue.jpg",
+    "storyCount": 1,
+    "tags": [
+      "làng nghề",
+      "thủ công",
+      "Huế"
+    ]
+  },
+  {
+    "id": "place-003",
+    "name": "Đền Hùng",
+    "description": "Khu di tích lịch sử quốc gia đặc biệt, nơi thờ các vua Hùng.",
+    "address": "Xã Hy Cương, TP. Việt Trì, Phú Thọ",
+    "region": "Phú Thọ",
+    "latitude": 21.3856,
+    "longitude": 105.3167,
+    "image": "../assets/images/hoang-thanh-thang-long.jpg",
+    "storyCount": 1,
+    "tags": [
+      "di tích",
+      "tín ngưỡng",
+      "Phú Thọ"
+    ]
+  },
+  {
+    "id": "place-004",
+    "name": "Làng gốm Bát Tràng",
+    "description": "Làng nghề gốm sứ truyền thống hơn 700 năm tuổi.",
+    "address": "Xã Bát Tràng, huyện Gia Lâm, Hà Nội",
+    "region": "Hà Nội",
+    "latitude": 20.9756,
+    "longitude": 105.9153,
+    "image": "../assets/images/pho-co-hoi-an.jpg",
+    "storyCount": 1,
+    "tags": [
+      "làng nghề",
+      "gốm sứ",
+      "Hà Nội"
+    ]
+  }
+]

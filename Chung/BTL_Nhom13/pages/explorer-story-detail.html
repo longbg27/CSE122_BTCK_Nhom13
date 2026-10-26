@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết câu chuyện – Hành Trình Văn Hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">HT</span>
+        Hành Trình Văn Hóa
+      </a>
+      <nav class="nav-main">
+        <a href="index.html">Trang chủ</a>
+        <a href="explorer-story-discovery.html">Khám phá</a>
+        <a href="explorer-my-trail.html">Trail của tôi</a>
+        <a href="profile.html">Hồ sơ</a>
+      </nav>
+      <div class="header-actions">
+        <button class="menu-toggle" aria-label="Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container" style="max-width: 800px;">
+      <div id="content">
+        <div class="state-box">
+          <div class="spinner"></div>
+          <p>Đang tải...</p>
+        </div>
+      </div>
+
+      <!-- AI Story Summarizer -->
+      <div class="ai-panel" id="ai-panel" style="display: none;">
+        <div class="ai-panel-header">
+          <span class="ai-icon">AI</span>
+          <div>
+            <strong>AI Story Summarizer</strong>
+            <p class="text-muted" style="font-size: 0.85rem; margin: 0;">Rút gọn nội dung dài thành bản tóm tắt dễ đọc</p>
+          </div>
+        </div>
+        <div id="ai-input-area">
+          <p class="mb-1">Nhấn nút bên dưới để AI tóm tắt câu chuyện này.</p>
+          <button class="btn btn-primary btn-sm" id="btn-summarize">✨ Tóm tắt bằng AI</button>
+        </div>
+        <div id="ai-loading" class="hidden">
+          <div class="spinner"></div>
+          <p class="text-center">AI đang phân tích và tóm tắt...</p>
+        </div>
+        <div id="ai-result" class="hidden">
+          <div class="ai-result">
+            <h4>Bản tóm tắt</h4>
+            <p id="summary-text"></p>
+            <p class="text-muted mt-1" style="font-size: 0.85rem;"><strong>Vì sao:</strong> <span id="summary-reason"></span></p>
+          </div>
+          <div class="ai-actions">
+            <button class="btn btn-primary btn-sm" id="btn-accept">✓ Chấp nhận</button>
+            <button class="btn btn-outline btn-sm" id="btn-edit">✎ Chỉnh sửa</button>
+            <button class="btn btn-ghost btn-sm" id="btn-retry">↻ Tạo lại</button>
+            <button class="btn btn-ghost btn-sm" id="btn-reject">✕ Từ chối</button>
+          </div>
+        </div>
+        <div id="ai-fail" class="hidden">
+          <div class="alert alert-warning">AI chưa chắc chắn về kết quả này hoặc không đủ dữ liệu. Bạn có thể thử lại hoặc tóm tắt thủ công.</div>
+          <div class="ai-actions">
+            <button class="btn btn-outline btn-sm" id="btn-retry-fail">↻ Thử lại</button>
+            <button class="btn btn-ghost btn-sm" id="btn-skip">Bỏ qua</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border: none; margin: 0; padding: 0;">
+        © 2026 Hành Trình Văn Hóa – BTL CSE122
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const storyId = params.get('id') || 'story-001';
+    let currentStory = null;
+
+    async function loadStory() {
+      const container = document.getElementById('content');
+      currentStory = await API.getStory(storyId);
+      if (!currentStory) {
+        container.innerHTML = '<div class="state-box"><div class="icon">😕</div><h3>Không tìm thấy câu chuyện</h3><a href="explorer-story-discovery.html" class="btn btn-primary mt-2">Quay lại</a></div>';
+        return;
+      }
+      const place = await API.getPlace(currentStory.placeId);
+      const creator = await API.getCreator(currentStory.creatorId);
+
+      container.innerHTML = `
+        <a href="explorer-story-discovery.html" class="text-muted" style="font-size: 0.9rem;">← Quay lại danh sách</a>
+        <article class="mt-2">
+          <img src="${currentStory.image}" alt="${escapeHtml(currentStory.title)}" style="width:100%; height:280px; object-fit:cover; border-radius: var(--radius-lg); margin-bottom: 1.5rem;">
+          <div class="tag-list mb-2">
+            ${(currentStory.tags || []).map(t => `<span class="badge badge-primary">${escapeHtml(t)}</span>`).join('')}
+          </div>
+          <h1>${escapeHtml(currentStory.title)}</h1>
+          <div class="card-meta mb-2 mt-1">
+            <span>📍 ${place ? escapeHtml(place.name) : '—'}</span>
+            <span>✍️ ${creator ? escapeHtml(creator.name) : '—'}</span>
+            <span>👁 ${currentStory.views.toLocaleString()}</span>
+            <span>❤️ ${currentStory.likes}</span>
+            <span>📅 ${formatDate(currentStory.createdAt)}</span>
+          </div>
+          <div style="font-size: 1.05rem; line-height: 1.8;">
+            ${escapeHtml(currentStory.content).replace(/\n/g, '<br>')}
+          </div>
+          <div class="mt-3 flex gap-1">
+            <a href="explorer-place-detail.html?id=${currentStory.placeId}" class="btn btn-outline btn-sm">Xem địa điểm</a>
+            <button class="btn btn-primary btn-sm" id="btn-add-trail">+ Thêm vào Trail</button>
+          </div>
+        </article>
+      `;
+      document.getElementById('ai-panel').style.display = 'block';
+
+      document.getElementById('btn-add-trail')?.addEventListener('click', () => {
+        showToast('Đã thêm vào Trail của bạn (demo)', 'success');
+      });
+    }
+
+    // AI Summarizer logic
+    document.getElementById('btn-summarize')?.addEventListener('click', runSummarize);
+    document.getElementById('btn-retry')?.addEventListener('click', runSummarize);
+    document.getElementById('btn-retry-fail')?.addEventListener('click', runSummarize);
+
+    async function runSummarize() {
+      document.getElementById('ai-input-area').classList.add('hidden');
+      document.getElementById('ai-result').classList.add('hidden');
+      document.getElementById('ai-fail').classList.add('hidden');
+      document.getElementById('ai-loading').classList.remove('hidden');
+
+      await delay(1500 + Math.random() * 1000);
+
+      // Mock failure ~15%
+      if (Math.random() < 0.15) {
+        document.getElementById('ai-loading').classList.add('hidden');
+        document.getElementById('ai-fail').classList.remove('hidden');
+        return;
+      }
+
+      const summaries = [
+        {
+          text: currentStory.summary + ' Đây là bản tóm tắt ngắn gọn giúp bạn nắm nhanh nội dung chính của câu chuyện.',
+          reason: 'AI trích xuất các ý chính dựa trên đoạn mở đầu và kết thúc, giữ nguyên giọng văn kể chuyện.'
+        },
+        {
+          text: 'Câu chuyện kể về ' + currentStory.title.toLowerCase() + '. ' + currentStory.content.slice(0, 120) + '...',
+          reason: 'Sử dụng kỹ thuật extractive summarization kết hợp với ngữ cảnh văn hóa Việt Nam.'
+        }
+      ];
+      const pick = summaries[Math.floor(Math.random() * summaries.length)];
+
+      document.getElementById('summary-text').textContent = pick.text;
+      document.getElementById('summary-reason').textContent = pick.reason;
+      document.getElementById('ai-loading').classList.add('hidden');
+      document.getElementById('ai-result').classList.remove('hidden');
+    }
+
+    document.getElementById('btn-accept')?.addEventListener('click', () => {
+      showToast('Đã lưu bản tóm tắt vào ghi chú của bạn.', 'success');
+    });
+    document.getElementById('btn-edit')?.addEventListener('click', () => {
+      const text = document.getElementById('summary-text');
+      text.contentEditable = true;
+      text.focus();
+      showToast('Bạn có thể chỉnh sửa trực tiếp bản tóm tắt.', 'info');
+    });
+    document.getElementById('btn-reject')?.addEventListener('click', () => {
+      document.getElementById('ai-result').classList.add('hidden');
+      document.getElementById('ai-input-area').classList.remove('hidden');
+      showToast('Đã từ chối kết quả AI.', 'info');
+    });
+    document.getElementById('btn-skip')?.addEventListener('click', () => {
+      document.getElementById('ai-fail').classList.add('hidden');
+      document.getElementById('ai-input-area').classList.remove('hidden');
+    });
+
+    loadStory();
+  </script>
+</body>
+</html>

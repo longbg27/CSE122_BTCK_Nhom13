@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hành Trình Văn Hóa – Khám phá văn hóa theo câu chuyện</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">HT</span>
+        Hành Trình Văn Hóa
+      </a>
+      <nav class="nav-main">
+        <a href="index.html" class="active">Trang chủ</a>
+        <a href="explorer-story-discovery.html">Khám phá</a>
+        <a href="explorer-my-trail.html">Trail của tôi</a>
+        <a href="profile.html">Hồ sơ</a>
+      </nav>
+      <div class="header-actions">
+        <a href="login.html" class="btn btn-outline btn-sm" id="auth-btn">Đăng nhập</a>
+        <img src="" alt="User" class="user-avatar hidden" id="user-avatar">
+        <button class="menu-toggle" aria-label="Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section style="background: linear-gradient(135deg, #c45c26 0%, #9a3f12 60%, #1a5f4a 100%); color: white; padding: 4rem 0 5rem;">
+      <div class="container" style="text-align: center;">
+        <h1 style="color: white; font-size: 2.5rem; margin-bottom: 1rem;">Khám phá văn hóa qua từng câu chuyện</h1>
+        <p style="font-size: 1.15rem; opacity: 0.9; max-width: 600px; margin: 0 auto 2rem;">
+          Hành Trình Văn Hóa kết nối bạn với những câu chuyện địa phương, địa danh và tuyến khám phá văn hóa độc đáo.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="explorer-story-discovery.html" class="btn btn-lg" style="background: white; color: #c45c26;">Bắt đầu khám phá</a>
+          <a href="register.html" id="cta-register" class="btn btn-lg btn-outline" style="border-color: white; color: white;">Đăng ký miễn phí</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="main-content">
+      <div class="container">
+        <div class="page-header flex-between">
+          <div>
+            <h2>Câu chuyện nổi bật</h2>
+            <p class="subtitle">Những câu chuyện được yêu thích nhất</p>
+          </div>
+          <a href="explorer-story-discovery.html" class="btn btn-outline btn-sm">Xem tất cả →</a>
+        </div>
+        <div id="featured-stories" class="grid grid-3">
+          <div class="state-box" style="grid-column: 1 / -1;">
+            <div class="spinner"></div>
+            <p>Đang tải câu chuyện...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="background: white; padding: 3rem 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);">
+      <div class="container">
+        <div class="page-header flex-between">
+          <div>
+            <h2>Địa danh văn hóa</h2>
+            <p class="subtitle">Những điểm đến đáng để bạn ghé thăm</p>
+          </div>
+          <a href="explorer-story-discovery.html" class="btn btn-outline btn-sm">Xem thêm →</a>
+        </div>
+        <div id="featured-places" class="grid grid-3"></div>
+      </div>
+    </section>
+
+    <section class="main-content">
+      <div class="container">
+        <h2 class="text-center mb-3">Cách Hành Trình Văn Hóa hoạt động</h2>
+        <div class="grid grid-3">
+          <div class="card" style="text-align: center; padding: 1.5rem;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">📖</div>
+            <h3>Khám phá câu chuyện</h3>
+            <p class="text-muted">Đọc những câu chuyện văn hóa địa phương được kể bởi nghệ nhân và nhà nghiên cứu.</p>
+          </div>
+          <div class="card" style="text-align: center; padding: 1.5rem;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🗺️</div>
+            <h3>Tạo tuyến khám phá</h3>
+            <p class="text-muted">Gom các câu chuyện và địa danh yêu thích thành hành trình của riêng bạn.</p>
+          </div>
+          <div class="card" style="text-align: center; padding: 1.5rem;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🎨</div>
+            <h3>Gặp gỡ nghệ nhân</h3>
+            <p class="text-muted">Kết nối với những người đang giữ gìn và sáng tạo văn hóa truyền thống.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border: none; margin: 0; padding: 0;">
+        © 2026 Hành Trình Văn Hóa – BTL CSE122. Dự án học tập.
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    const HT_FALLBACK = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c45c26"/><stop offset="1" stop-color="#1a5f4a"/></linearGradient></defs><rect width="800" height="500" fill="url(#g)"/></svg>'
+    );
+
+    function htImg(src, alt, cls, style) {
+      return `<img src="${src || HT_FALLBACK}" alt="${escapeHtml(alt)}" class="${cls || ''}" style="${style || ''}" loading="lazy" onerror="this.onerror=null;this.src=HT_FALLBACK">`;
+    }
+
+    function htStoryCard(s, place) {
+      return `
+        <article class="card">
+          ${htImg(s.image, s.title, 'card-img')}
+          <div class="card-body">
+            <div class="tag-list mb-1">
+              ${(s.tags || []).slice(0, 2).map(t => `<span class="badge badge-primary">${escapeHtml(t)}</span>`).join('')}
+            </div>
+            <h3 class="card-title"><a href="explorer-story-detail.html?id=${s.id}">${escapeHtml(s.title)}</a></h3>
+            <p class="card-text">${escapeHtml(s.summary)}</p>
+            <div class="card-meta">
+              ${place ? `<span>📍 ${escapeHtml(place.name)}</span>` : ''}
+              <span>👁 ${(s.views || 0).toLocaleString('vi-VN')}</span>
+              <span>❤️ ${s.likes || 0}</span>
+            </div>
+          </div>
+        </article>`;
+    }
+
+    function htPlaceCard(p) {
+      return `
+        <article class="card">
+          ${htImg(p.image, p.name, 'card-img')}
+          <div class="card-body">
+            <div class="tag-list mb-1">
+              ${(p.tags || []).slice(0, 2).map(t => `<span class="badge badge-primary">${escapeHtml(t)}</span>`).join('')}
+            </div>
+            <h3 class="card-title"><a href="explorer-place-detail.html?id=${p.id}">${escapeHtml(p.name)}</a></h3>
+            <p class="card-text">${escapeHtml(p.description)}</p>
+            <div class="card-meta">
+              <span>📍 ${escapeHtml(p.region)}</span>
+              <span>📖 ${p.storyCount || 0} câu chuyện</span>
+            </div>
+          </div>
+        </article>`;
+    }
+
+    function htSetupAuth() {
+      const user = API.getCurrentUser();
+      if (!user) return;
+      document.getElementById('auth-btn').classList.add('hidden');
+      const av = document.getElementById('user-avatar');
+      av.classList.remove('hidden');
+      av.src = user.avatar;
+      av.alt = user.name;
+      av.style.cursor = 'pointer';
+      av.onclick = () => { location.href = 'profile.html'; };
+      document.getElementById('cta-register').classList.add('hidden');
+    }
+
+    async function loadHome() {
+      const storyBox = document.getElementById('featured-stories');
+      const placeBox = document.getElementById('featured-places');
+      try {
+        const [stories, places] = await Promise.all([API.getStories(), API.getPlaces()]);
+
+        const top = stories
+          .filter(s => s.status === 'published')
+          .sort((a, b) => b.views - a.views)
+          .slice(0, 3);
+
+        storyBox.innerHTML = top.length
+          ? top.map(s => htStoryCard(s, places.find(p => p.id === s.placeId))).join('')
+          : '<div class="state-box" style="grid-column: 1 / -1;"><p>Chưa có câu chuyện nào.</p></div>';
+
+        placeBox.innerHTML = places.slice(0, 3).map(htPlaceCard).join('');
+      } catch (err) {
+        console.error(err);
+        storyBox.innerHTML = '<div class="state-box" style="grid-column: 1 / -1;"><p>Không thể tải dữ liệu. Hãy mở trang bằng Live Server.</p></div>';
+      }
+    }
+
+    htSetupAuth();
+    loadHome();
+  </script>
+</body>
+</html>

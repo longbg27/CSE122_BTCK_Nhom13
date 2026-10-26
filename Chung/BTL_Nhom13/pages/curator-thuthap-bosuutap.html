@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thu thập bộ sưu tập – Hành trình văn hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> Hành Trình Văn Hóa</a>
+      <nav class="nav-main">
+        <a href="curator-duyet-ndung.html">Duyệt nội dung</a>
+        <a href="curator-qly-bosuutap.html">Bộ sưu tập</a>
+        <a href="ad-bangdieukhien.html">Bảng điều khiển</a>
+      </nav>
+      <div class="header-actions"><button class="menu-toggle" aria-label="Menu">☰</button></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container" style="max-width:720px;">
+      <div class="page-header">
+        <h1>Tạo / Chỉnh sửa Bộ sưu tập</h1>
+      </div>
+
+      <form id="col-form" class="card" style="padding:1.5rem;" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="title">Tiêu đề *</label>
+          <input type="text" id="title" class="form-control" required>
+          <div class="form-error">Bắt buộc.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="desc">Mô tả</label>
+          <textarea id="desc" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Chọn câu chuyện</label>
+          <div id="story-checks" style="max-height:200px;overflow-y:auto;border:1px solid var(--color-border);border-radius:var(--radius-md);padding:0.75rem;"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="tags">Tags</label>
+          <input type="text" id="tags" class="form-control" placeholder="tag1, tag2...">
+        </div>
+        <button type="submit" class="btn btn-primary">Lưu Bộ sưu tập</button>
+      </form>
+
+      <!-- AI Tag Recommender -->
+      <div class="ai-panel mt-3">
+        <div class="ai-panel-header">
+          <span class="ai-icon">AI</span>
+          <div>
+            <strong>AI Tag Recommender</strong>
+            <p class="text-muted" style="font-size:0.85rem;margin:0;">Gợi ý tag phù hợp dựa trên tiêu đề và mô tả</p>
+          </div>
+        </div>
+        <div id="ai-input">
+          <button type="button" class="btn btn-primary btn-sm" id="btn-rec">✨ Gợi ý tag</button>
+        </div>
+        <div id="ai-loading" class="hidden"><div class="spinner"></div><p class="text-center">AI đang phân tích...</p></div>
+        <div id="ai-result" class="hidden">
+          <div class="ai-result">
+            <h4>Tags gợi ý</h4>
+            <div class="tag-list" id="rec-tags"></div>
+            <p class="text-muted mt-1" style="font-size:0.85rem;"><strong>Vì sao:</strong> <span id="rec-reason"></span></p>
+          </div>
+          <div class="ai-actions">
+            <button type="button" class="btn btn-primary btn-sm" id="btn-use">✓ Áp dụng</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-retry">↻ Tạo lại</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-reject">✕ Từ chối</button>
+          </div>
+        </div>
+        <div id="ai-fail" class="hidden">
+          <div class="alert alert-warning">Không đủ dữ liệu để đưa ra đề xuất. Hãy nhập thêm tiêu đề/mô tả.</div>
+          <button type="button" class="btn btn-outline btn-sm" id="btn-retry-fail">↻ Thử lại</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 CultureTrail</div></div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    let recommended = [];
+    async function init() {
+      const stories = (await API.getStories()).filter(s => s.status === 'published');
+      document.getElementById('story-checks').innerHTML = stories.map(s => `
+        <label style="display:block;margin-bottom:0.4rem;font-size:0.9rem;">
+          <input type="checkbox" name="stories" value="${s.id}"> ${escapeHtml(s.title)}
+        </label>
+      `).join('');
+    }
+
+    document.getElementById('col-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validateForm(e.target)) return;
+      const storyIds = [...document.querySelectorAll('input[name="stories"]:checked')].map(c => c.value);
+      const data = {
+        title: document.getElementById('title').value.trim(),
+        description: document.getElementById('desc').value.trim(),
+        storyIds,
+        curatorId: 'curator-001',
+        status: 'draft'
+      };
+      await API.createCollection(data);
+      showToast('Đã tạo collection.', 'success');
+      setTimeout(() => location.href = 'curator-qly-bosuutap.html', 800);
+    });
+
+    async function runRec() {
+      const title = document.getElementById('title').value.trim();
+      const desc = document.getElementById('desc').value.trim();
+      if (!title && !desc) {
+        showToast('Nhập tiêu đề hoặc mô tả trước.', 'error');
+        return;
+      }
+      document.getElementById('ai-input').classList.add('hidden');
+      document.getElementById('ai-result').classList.add('hidden');
+      document.getElementById('ai-fail').classList.add('hidden');
+      document.getElementById('ai-loading').classList.remove('hidden');
+      await delay(1200);
+      if (Math.random() < 0.12 || (!title && desc.length < 20)) {
+        document.getElementById('ai-loading').classList.add('hidden');
+        document.getElementById('ai-fail').classList.remove('hidden');
+        return;
+      }
+      const allTags = await API.getTags();
+      const text = (title + ' ' + desc).toLowerCase();
+      recommended = allTags
+        .filter(t => text.includes(t.name.toLowerCase()) || Math.random() > 0.7)
+        .slice(0, 5)
+        .map(t => t.name);
+      if (recommended.length < 2) recommended = ['văn hóa', 'di sản', 'truyền thống', 'địa phương'].slice(0, 4);
+
+      document.getElementById('rec-tags').innerHTML = recommended.map(t =>
+        `<span class="badge badge-primary" style="cursor:pointer;font-size:0.9rem;">${escapeHtml(t)}</span>`
+      ).join(' ');
+      document.getElementById('rec-reason').textContent =
+        'AI phân tích từ khóa trong tiêu đề/mô tả và so khớp với taxonomy hiện có, ưu tiên tag phổ biến.';
+      document.getElementById('ai-loading').classList.add('hidden');
+      document.getElementById('ai-result').classList.remove('hidden');
+    }
+
+    document.getElementById('btn-rec').addEventListener('click', runRec);
+    document.getElementById('btn-retry').addEventListener('click', runRec);
+    document.getElementById('btn-retry-fail').addEventListener('click', () => {
+      document.getElementById('ai-fail').classList.add('hidden');
+      document.getElementById('ai-input').classList.remove('hidden');
+    });
+    document.getElementById('btn-use').addEventListener('click', () => {
+      document.getElementById('tags').value = recommended.join(', ');
+      showToast('Đã áp dụng tags.', 'success');
+    });
+    document.getElementById('btn-reject').addEventListener('click', () => {
+      document.getElementById('ai-result').classList.add('hidden');
+      document.getElementById('ai-input').classList.remove('hidden');
+    });
+
+    init();
+  </script>
+</body>
+</html>

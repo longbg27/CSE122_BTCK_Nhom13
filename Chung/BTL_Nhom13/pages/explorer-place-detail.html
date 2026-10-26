@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết địa điểm – Hành Trình Văn Hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> Hành Trình Văn Hóa</a>
+      <nav class="nav-main">
+        <a href="index.html">Trang chủ</a>
+        <a href="explorer-story-discovery.html">Khám phá</a>
+        <a href="explorer-my-trail.html">Trail của tôi</a>
+      </nav>
+      <div class="header-actions"><button class="menu-toggle" aria-label="Menu">☰</button></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div id="content">
+        <div class="state-box"><div class="spinner"></div><p>Đang tải...</p></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 Hành Trình Văn Hóa</div></div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    const id = new URLSearchParams(location.search).get('id') || 'place-001';
+    async function load() {
+      const place = await API.getPlace(id);
+      const container = document.getElementById('content');
+      if (!place) {
+        container.innerHTML = '<div class="state-box"><h3>Không tìm thấy địa điểm</h3><a href="explorer-story-discovery.html" class="btn btn-primary mt-2">Quay lại</a></div>';
+        return;
+      }
+      const stories = (await API.getStories()).filter(s => s.placeId === id && s.status === 'published');
+      container.innerHTML = `
+        <a href="explorer-story-discovery.html" class="text-muted" style="font-size:0.9rem;">← Quay lại</a>
+        <div class="mt-2 grid grid-2" style="align-items:start;">
+          <div>
+            ${place.image
+              ? `<img src="${place.image}" alt="${escapeHtml(place.name)}" style="width:100%;height:280px;object-fit:cover;border-radius:var(--radius-lg);">`
+              : `<div style="width:100%;height:280px;display:flex;align-items:center;justify-content:center;font-size:5rem;border-radius:var(--radius-lg);background:linear-gradient(135deg,#c45c26 0%,#1a5f4a 100%);">${place.emoji || '📍'}</div>`}
+          </div>
+          <div>
+            <div class="tag-list mb-1">${(place.tags||[]).map(t=>`<span class="badge badge-primary">${escapeHtml(t)}</span>`).join('')}</div>
+            <h1>${escapeHtml(place.name)}</h1>
+            <p class="text-muted mt-1">📍 ${escapeHtml(place.address)}</p>
+            <p class="mt-2">${escapeHtml(place.description)}</p>
+            <div class="card-meta mt-2">
+              <span>📖 ${place.storyCount} câu chuyện</span>
+              <span>🗺 ${escapeHtml(place.region)}</span>
+            </div>
+            <button class="btn btn-primary mt-2" onclick="showToast('Đã thêm địa điểm vào Trail','success')">+ Thêm vào Trail</button>
+          </div>
+        </div>
+        <h2 class="mt-3 mb-2">Câu chuyện gắn với địa điểm</h2>
+        <div class="grid grid-3">
+          ${stories.length ? stories.map(s => `
+            <article class="card">
+              <img src="${s.image}" class="card-img" alt="">
+              <div class="card-body">
+                <h3 class="card-title"><a href="explorer-story-detail.html?id=${s.id}">${escapeHtml(s.title)}</a></h3>
+                <p class="card-text">${escapeHtml(s.summary)}</p>
+              </div>
+            </article>
+          `).join('') : '<div class="state-box" style="grid-column:1/-1;"><p>Chưa có câu chuyện nào.</p></div>'}
+        </div>
+      `;
+    }
+    load();
+  </script>
+</body>
+</html>

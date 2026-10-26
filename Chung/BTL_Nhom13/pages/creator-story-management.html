@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý câu chuyện – Hành trình văn hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> Hành trình văn hóa</a>
+      <nav class="nav-main" aria-label="Khu vực nghệ nhân">
+        <a href="creator-dashboard.html">Bảng điều khiển</a>
+        <a href="creator-story-management.html" class="active" aria-current="page">Câu chuyện</a>
+        <a href="creator-event-management.html">Sự kiện</a>
+        <a href="creator-profile.html">Hồ sơ</a>
+      </nav>
+      <div class="header-actions">
+        <a href="notifications.html" class="btn-icon notif-btn" aria-label="Thông báo" title="Thông báo">
+          <span aria-hidden="true">🔔</span><span class="notif-badge hidden" data-notif-badge>0</span>
+        </a>
+        <a href="creator-profile.html" class="avatar-link" aria-label="Hồ sơ của tôi">
+          <img src="https://i.pravatar.cc/150?img=12" alt="" class="user-avatar" data-user-avatar>
+        </a>
+        <button class="menu-toggle" aria-label="Mở menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content" id="main-content">
+    <div class="container">
+      <div class="page-header flex-between" style="flex-wrap:wrap;gap:1rem;">
+        <div>
+          <h1>Quản lý câu chuyện</h1>
+          <p class="subtitle">Tạo, chỉnh sửa và theo dõi trạng thái duyệt câu chuyện của bạn</p>
+        </div>
+        <a href="creator-story-form.html" class="btn btn-primary">+ Tạo câu chuyện</a>
+      </div>
+
+      <div id="error-state" class="hidden">
+        <div class="state-box">
+          <div class="icon" aria-hidden="true">⚠️</div>
+          <h2>Không tải được danh sách câu chuyện</h2>
+          <p>Dữ liệu câu chuyện chưa sẵn sàng. Kiểm tra kết nối rồi thử lại.</p>
+          <div class="state-actions">
+            <button type="button" class="btn btn-primary" id="retry-btn">Thử lại</button>
+            <a href="creator-dashboard.html" class="btn btn-ghost">Về bảng điều khiển</a>
+          </div>
+        </div>
+      </div>
+
+      <div id="list-area">
+        <div class="tabs" role="group" aria-label="Lọc theo trạng thái">
+          <button type="button" class="tab active" data-filter="all" aria-pressed="true">
+            Tất cả <span class="tab-count" data-count="all">0</span>
+          </button>
+          <button type="button" class="tab" data-filter="published" aria-pressed="false">
+            Đã xuất bản <span class="tab-count" data-count="published">0</span>
+          </button>
+          <button type="button" class="tab" data-filter="pending" aria-pressed="false">
+            Chờ duyệt <span class="tab-count" data-count="pending">0</span>
+          </button>
+          <button type="button" class="tab" data-filter="rejected" aria-pressed="false">
+            Bị từ chối <span class="tab-count" data-count="rejected">0</span>
+          </button>
+          <button type="button" class="tab" data-filter="archived" aria-pressed="false">
+            Lưu trữ <span class="tab-count" data-count="archived">0</span>
+          </button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="search-box">
+            <label class="sr-only" for="search">Tìm câu chuyện</label>
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input type="search" id="search" class="form-control" placeholder="Tìm theo tiêu đề, tóm tắt hoặc tag...">
+          </div>
+          <select id="sort" class="form-control" style="max-width:240px;" aria-label="Sắp xếp câu chuyện">
+            <option value="updated-desc">Cập nhật: mới nhất trước</option>
+            <option value="updated-asc">Cập nhật: cũ nhất trước</option>
+            <option value="views">Lượt xem nhiều nhất</option>
+            <option value="title">Tiêu đề A → Z</option>
+          </select>
+        </div>
+
+        <p class="text-muted mb-2" id="result-count" aria-live="polite"></p>
+
+        <div class="table-wrapper table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Câu chuyện</th>
+                <th scope="col">Trạng thái</th>
+                <th scope="col">Hiệu suất</th>
+                <th scope="col">Cập nhật</th>
+                <th scope="col">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <tr>
+                <td colspan="5" class="text-center">
+                  <div class="spinner" style="margin:1rem auto;"></div>
+                  <span class="text-muted">Đang tải câu chuyện...</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="form-hint mt-1">Câu chuyện gửi duyệt sẽ do curator kiểm tra trước khi xuất bản. Nội dung bị từ chối cần bổ sung rồi gửi duyệt lại.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 CultureTrail – BTL CSE122</div>
+    </div>
+  </footer>
+
+  <dialog id="confirm-dialog" class="confirm-dialog" aria-labelledby="dialog-title">
+    <form method="dialog" class="dialog-body">
+      <h2 id="dialog-title">Xóa câu chuyện?</h2>
+      <p id="dialog-message"></p>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn btn-ghost">Hủy bỏ</button>
+        <button value="confirm" class="btn btn-danger" id="dialog-confirm">Xóa vĩnh viễn</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    const CREATOR_ID = getActiveCreatorId();
+
+    const listArea = document.getElementById('list-area');
+    const errorState = document.getElementById('error-state');
+    const tbody = document.getElementById('table-body');
+    const searchInput = document.getElementById('search');
+    const sortSelect = document.getElementById('sort');
+    const resultCount = document.getElementById('result-count');
+    const dialog = document.getElementById('confirm-dialog');
+    const dialogTitle = document.getElementById('dialog-title');
+    const dialogMessage = document.getElementById('dialog-message');
+    const dialogConfirm = document.getElementById('dialog-confirm');
+
+    let stories = [];
+    let places = [];
+    let activeFilter = 'all';
+    let pendingAction = null;
+
+    const ACTIONS = {
+      archive: {
+        title: 'Lưu trữ câu chuyện?',
+        message: story => `“${story.title}” sẽ được ẩn khỏi trang khám phá và chuyển vào mục Lưu trữ. Bạn có thể khôi phục sau.`,
+        confirm: 'Lưu trữ',
+        buttonClass: 'btn btn-primary',
+        run: id => API.updateStory(id, { status: 'archived' }),
+        toast: 'Đã lưu trữ câu chuyện.',
+        toastType: 'info'
+      },
+      restore: {
+        title: 'Khôi phục và gửi duyệt?',
+        message: story => `“${story.title}” sẽ được khôi phục từ Lưu trữ và gửi lại cho curator duyệt.`,
+        confirm: 'Gửi duyệt',
+        buttonClass: 'btn btn-primary',
+        run: id => API.updateStory(id, { status: 'pending' }),
+        toast: 'Đã khôi phục. Câu chuyện đang chờ duyệt.',
+        toastType: 'success'
+      },
+      resubmit: {
+        title: 'Gửi duyệt lại?',
+        message: story => `“${story.title}” sẽ chuyển lại sang trạng thái Chờ duyệt. Hãy chắc rằng bạn đã bổ sung nội dung theo góp ý của curator.`,
+        confirm: 'Gửi duyệt lại',
+        buttonClass: 'btn btn-primary',
+        run: id => API.updateStory(id, { status: 'pending' }),
+        toast: 'Đã gửi duyệt lại.',
+        toastType: 'success'
+      },
+      delete: {
+        title: 'Xóa câu chuyện?',
+        message: story => `“${story.title}” sẽ bị xóa vĩnh viễn khỏi hệ thống. Thao tác này không thể hoàn tác.`,
+        confirm: 'Xóa vĩnh viễn',
+        buttonClass: 'btn btn-danger',
+        run: id => API.deleteStory(id),
+        toast: 'Đã xóa câu chuyện.',
+        toastType: 'success'
+      }
+    };
+
+    function placeName(placeId) {
+      const place = places.find(p => p.id === placeId);
+      return place ? place.name : 'Chưa xác định địa điểm';
+    }
+
+    function showError() {
+      listArea.classList.add('hidden');
+      errorState.classList.remove('hidden');
+    }
+
+    function showLoading() {
+      errorState.classList.add('hidden');
+      listArea.classList.remove('hidden');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center">
+            <div class="spinner" style="margin:1rem auto;"></div>
+            <span class="text-muted">Đang tải câu chuyện...</span>
+          </td>
+        </tr>`;
+    }
+
+    async function load() {
+      showLoading();
+      try {
+        const [storyList, placeList] = await Promise.all([API.getStories(), API.getPlaces()]);
+        if (!storyList.length && API.getLoadError('stories.json')) {
+          throw new Error('load');
+        }
+        stories = storyList.filter(s => s.creatorId === CREATOR_ID);
+        places = placeList;
+        render();
+      } catch (err) {
+        showError();
+      }
+    }
+
+    function updateCounts() {
+      const counts = { all: stories.length, published: 0, pending: 0, rejected: 0, archived: 0 };
+      stories.forEach(s => {
+        if (counts[s.status] !== undefined) counts[s.status] += 1;
+      });
+      document.querySelectorAll('[data-count]').forEach(el => {
+        el.textContent = counts[el.dataset.count] ?? 0;
+      });
+    }
+
+    function syncTabs() {
+      document.querySelectorAll('.tab[data-filter]').forEach(tab => {
+        const isActive = tab.dataset.filter === activeFilter;
+        tab.classList.toggle('active', isActive);
+        tab.setAttribute('aria-pressed', String(isActive));
+      });
+    }
+
+    function getFilteredStories() {
+      const query = searchInput.value.trim().toLowerCase();
+      let list = stories.filter(s => {
+        const matchStatus = activeFilter === 'all' || s.status === activeFilter;
+        const haystack = [s.title, s.summary, placeName(s.placeId), ...(s.tags || [])]
+          .join(' ')
+          .toLowerCase();
+        const matchQuery = !query || haystack.includes(query);
+        return matchStatus && matchQuery;
+      });
+
+      const sort = sortSelect.value;
+      list.sort((a, b) => {
+        if (sort === 'title') return a.title.localeCompare(b.title, 'vi');
+        if (sort === 'views') return (Number(b.views) || 0) - (Number(a.views) || 0);
+        if (sort === 'updated-asc') {
+          return new Date(a.updatedAt || a.createdAt) - new Date(b.updatedAt || b.createdAt);
+        }
+        return new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt);
+      });
+      return list;
+    }
+
+    function emptyRow() {
+      const hasFilters = activeFilter !== 'all' || searchInput.value.trim();
+      if (stories.length === 0) {
+        return `
+          <tr>
+            <td colspan="5">
+              <div class="state-box">
+                <div class="icon" aria-hidden="true">✍️</div>
+                <h3>Bạn chưa có câu chuyện nào</h3>
+                <p>Chia sẻ câu chuyện văn hóa đầu tiên và gửi curator duyệt.</p>
+                <div class="state-actions">
+                  <a href="creator-story-form.html" class="btn btn-primary">+ Tạo câu chuyện</a>
+                </div>
+              </div>
+            </td>
+          </tr>`;
+      }
+      return `
+        <tr>
+          <td colspan="5">
+            <div class="state-box">
+              <div class="icon" aria-hidden="true">🔎</div>
+              <h3>Không tìm thấy câu chuyện phù hợp</h3>
+              <p>${hasFilters ? 'Thử từ khóa khác hoặc bỏ bộ lọc trạng thái.' : 'Danh sách đang trống.'}</p>
+              ${hasFilters ? '<div class="state-actions"><button type="button" class="btn btn-outline" data-clear-filters>Xóa bộ lọc</button></div>' : ''}
+            </div>
+          </td>
+        </tr>`;
+    }
+
+    function storyActions(story) {
+      const editLink = `<a href="creator-story-form.html?id=${story.id}" class="btn btn-ghost btn-sm">Sửa</a>`;
+
+      if (story.status === 'archived') {
+        return editLink
+          + `<button type="button" class="btn btn-ghost btn-sm" data-action="restore" data-id="${story.id}">Khôi phục</button>`
+          + `<button type="button" class="btn btn-ghost btn-sm text-error" data-action="delete" data-id="${story.id}">Xóa</button>`;
+      }
+
+      if (story.status === 'rejected') {
+        return editLink
+          + `<button type="button" class="btn btn-ghost btn-sm" data-action="resubmit" data-id="${story.id}">Gửi duyệt lại</button>`
+          + `<button type="button" class="btn btn-ghost btn-sm text-error" data-action="delete" data-id="${story.id}">Xóa</button>`;
+      }
+
+      return editLink
+        + `<button type="button" class="btn btn-ghost btn-sm" data-action="archive" data-id="${story.id}">Lưu trữ</button>`
+        + `<button type="button" class="btn btn-ghost btn-sm text-error" data-action="delete" data-id="${story.id}">Xóa</button>`;
+    }
+
+    function render() {
+      updateCounts();
+      syncTabs();
+      const list = getFilteredStories();
+      resultCount.textContent = `Hiển thị ${list.length}/${stories.length} câu chuyện của bạn`;
+
+      if (!list.length) {
+        tbody.innerHTML = emptyRow();
+        return;
+      }
+
+      tbody.innerHTML = list.map(story => {
+        const views = Number(story.views) || 0;
+        const likes = Number(story.likes) || 0;
+        const reviewNote = story.status === 'rejected' && story.reviewNote
+          ? `<span class="table-sub is-error">⚠ ${escapeHtml(story.reviewNote)}</span>`
+          : '';
+        return `
+          <tr>
+            <td>
+              <strong>${escapeHtml(story.title)}</strong>
+              <span class="table-sub">📍 ${escapeHtml(placeName(story.placeId))}</span>
+            </td>
+            <td>
+              <span class="badge ${statusBadgeClass(story.status)}">${statusLabel(story.status)}</span>
+              ${reviewNote}
+            </td>
+            <td>
+              <span class="num">👁 ${views.toLocaleString('vi-VN')}</span>
+              <span class="table-sub">❤️ ${likes.toLocaleString('vi-VN')} lượt thích</span>
+            </td>
+            <td class="num">${formatDate(story.updatedAt || story.createdAt)}</td>
+            <td>
+              <div class="table-actions">${storyActions(story)}</div>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    function askConfirmation(storyId, actionKey) {
+      const story = stories.find(s => s.id === storyId);
+      const action = ACTIONS[actionKey];
+      if (!story || !action) return;
+
+      pendingAction = { id: storyId, actionKey };
+      dialog.returnValue = '';
+      dialogTitle.textContent = action.title;
+      dialogMessage.textContent = action.message(story);
+      dialogConfirm.textContent = action.confirm;
+      dialogConfirm.className = action.buttonClass;
+      dialog.showModal();
+    }
+
+    dialog.addEventListener('close', async () => {
+      const pending = pendingAction;
+      pendingAction = null;
+      if (dialog.returnValue !== 'confirm' || !pending) return;
+
+      const action = ACTIONS[pending.actionKey];
+      if (!action) return;
+
+      dialogConfirm.disabled = true;
+      try {
+        await action.run(pending.id);
+        showToast(action.toast, action.toastType);
+        await load();
+      } catch (err) {
+        showToast('Không thể cập nhật câu chuyện. Vui lòng thử lại.', 'error');
+      } finally {
+        dialogConfirm.disabled = false;
+      }
+    });
+
+    tbody.addEventListener('click', (e) => {
+      if (e.target.closest('[data-clear-filters]')) {
+        searchInput.value = '';
+        activeFilter = 'all';
+        sortSelect.value = 'updated-desc';
+        render();
+        return;
+      }
+      const actionBtn = e.target.closest('[data-action]');
+      if (actionBtn) {
+        askConfirmation(actionBtn.dataset.id, actionBtn.dataset.action);
+      }
+    });
+
+    document.querySelectorAll('.tab[data-filter]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        activeFilter = tab.dataset.filter;
+        render();
+      });
+    });
+
+    searchInput.addEventListener('input', render);
+    sortSelect.addEventListener('change', render);
+    document.getElementById('retry-btn').addEventListener('click', load);
+
+    load();
+  </script>
+</body>
+</html>

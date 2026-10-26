@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hồ sơ của tôi – Hành Trình Văn Hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <style>
+    .profile-hero {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      align-items: center;
+      padding: 1.75rem;
+    }
+    .profile-avatar {
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--color-primary, #c45c26);
+      background: #f0f0f0;
+      flex-shrink: 0;
+    }
+    .profile-meta {
+      flex: 1;
+      min-width: 200px;
+    }
+    .profile-meta h2 {
+      margin: 0 0 0.35rem;
+      font-size: 1.5rem;
+    }
+    .profile-meta .email {
+      color: var(--color-muted, #6b7280);
+      margin-bottom: 0.75rem;
+      word-break: break-all;
+    }
+    .role-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: capitalize;
+      background: #fef3e8;
+      color: #9a3f12;
+    }
+    .role-badge.explorer { background: #e8f5e9; color: #1b5e20; }
+    .role-badge.creator { background: #fff3e0; color: #e65100; }
+    .role-badge.curator { background: #e3f2fd; color: #0d47a1; }
+    .role-badge.admin { background: #fce4ec; color: #880e4f; }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+    .info-item {
+      background: #fafafa;
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      border: 1px solid #eee;
+    }
+    .info-item .label {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-bottom: 0.25rem;
+    }
+    .info-item .value {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 0.35rem;
+      background: #22c55e;
+    }
+    .status-dot.locked { background: #ef4444; }
+    .profile-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid #eee;
+    }
+    .btn-danger {
+      background: #dc2626;
+      color: #fff;
+      border: none;
+    }
+    .btn-danger:hover {
+      background: #b91c1c;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> Hành Trình Văn Hóa</a>
+      <nav class="nav-main">
+        <a href="index.html">Trang chủ</a>
+        <a href="explorer-story-discovery.html">Khám phá</a>
+        <a href="creator-dashboard.html">Nghệ nhân</a>
+        <a href="admin-culture-dashboard.html">Quản trị</a>
+      </nav>
+      <div class="header-actions">
+        <a href="notifications.html" class="btn-icon notif-btn" aria-label="Thông báo" title="Thông báo">
+          <span aria-hidden="true">🔔</span><span class="notif-badge hidden" data-notif-badge>0</span>
+        </a>
+        <a href="profile.html" class="avatar-link" aria-label="Hồ sơ của tôi">
+          <img src="" alt="" class="user-avatar" data-user-avatar>
+        </a>
+        <button class="menu-toggle" aria-label="Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container" style="max-width:720px;">
+      <div class="page-header">
+        <h1>Hồ sơ của tôi</h1>
+        <p class="subtitle">Thông tin tài khoản đang đăng nhập</p>
+      </div>
+
+      <!-- Chưa đăng nhập -->
+      <div id="auth-gate" class="card" style="padding:2rem;text-align:center;display:none;">
+        <p class="mb-2">Bạn cần đăng nhập để xem hồ sơ.</p>
+        <a href="login.html" class="btn btn-primary">Đăng nhập</a>
+        <a href="register.html" class="btn btn-outline" style="margin-left:0.5rem;">Đăng ký</a>
+      </div>
+
+      <!-- Đang tải -->
+      <div id="profile-loading" class="card" style="padding:2rem;text-align:center;display:none;">
+        <p class="text-muted">Đang tải thông tin hồ sơ...</p>
+      </div>
+
+      <!-- Nội dung hồ sơ -->
+      <div id="profile-panel" style="display:none;">
+        <div class="card profile-hero">
+          <img id="user-avatar-img" class="profile-avatar" src="" alt="Ảnh đại diện">
+          <div class="profile-meta">
+            <h2 id="user-name">—</h2>
+            <p class="email" id="user-email">—</p>
+            <span class="role-badge" id="user-role">—</span>
+          </div>
+        </div>
+
+        <div class="card" style="padding:1.5rem;margin-top:1rem;">
+          <h3 style="margin-top:0;margin-bottom:0.75rem;">Chi tiết tài khoản</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="label">Mã người dùng</div>
+              <div class="value" id="user-id">—</div>
+            </div>
+            <div class="info-item">
+              <div class="label">Vai trò</div>
+              <div class="value" id="user-role-text">—</div>
+            </div>
+            <div class="info-item">
+              <div class="label">Trạng thái</div>
+              <div class="value" id="user-status">—</div>
+            </div>
+            <div class="info-item">
+              <div class="label">Ngày tham gia</div>
+              <div class="value" id="user-joined">—</div>
+            </div>
+          </div>
+
+          <div class="profile-actions">
+            <a href="settings.html" class="btn btn-outline">Cài đặt</a>
+            <button type="button" id="logout-btn" class="btn btn-danger">Đăng xuất</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 Hành Trình Văn Hóa</div>
+    </div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    (function () {
+      const ROLE_LABELS = {
+        explorer: 'Người khám phá',
+        creator: 'Nghệ nhân / Người sáng tạo',
+        curator: 'Người giám tuyển',
+        admin: 'Quản trị viên'
+      };
+
+      const authGate = document.getElementById('auth-gate');
+      const loadingEl = document.getElementById('profile-loading');
+      const panel = document.getElementById('profile-panel');
+
+      function show(el) {
+        if (el) el.style.display = '';
+      }
+      function hide(el) {
+        if (el) el.style.display = 'none';
+      }
+
+      function formatJoined(iso) {
+        if (!iso) return '—';
+        try {
+          if (typeof formatDate === 'function') return formatDate(iso);
+          const d = new Date(iso);
+          return d.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          });
+        } catch {
+          return iso;
+        }
+      }
+
+      function renderUser(user) {
+        const avatar = user.avatar || (typeof DEFAULT_AVATAR !== 'undefined' ? DEFAULT_AVATAR : 'https://i.pravatar.cc/150?u=default');
+        const role = (user.role || 'explorer').toLowerCase();
+        const roleLabel = ROLE_LABELS[role] || role;
+        const status = (user.status || 'active').toLowerCase();
+        const isActive = status === 'active';
+
+        document.getElementById('user-avatar-img').src = avatar;
+        document.getElementById('user-avatar-img').alt = 'Ảnh đại diện của ' + (user.name || '');
+        document.getElementById('user-name').textContent = user.name || 'Chưa cập nhật';
+        document.getElementById('user-email').textContent = user.email || '—';
+
+        const roleBadge = document.getElementById('user-role');
+        roleBadge.textContent = roleLabel;
+        roleBadge.className = 'role-badge ' + role;
+
+        document.getElementById('user-id').textContent = user.id || '—';
+        document.getElementById('user-role-text').textContent = roleLabel;
+        document.getElementById('user-status').innerHTML =
+          '<span class="status-dot' + (isActive ? '' : ' locked') + '"></span>' +
+          (isActive ? 'Đang hoạt động' : (status === 'locked' ? 'Đã khóa' : status));
+        document.getElementById('user-joined').textContent = formatJoined(user.joinedAt);
+
+        // Cập nhật avatar trên header nếu có
+        const headerAvatar = document.querySelector('[data-user-avatar]');
+        if (headerAvatar) {
+          headerAvatar.src = avatar;
+          headerAvatar.alt = 'Ảnh đại diện của ' + (user.name || '');
+        }
+      }
+
+      function init() {
+        if (!window.API) {
+          hide(loadingEl);
+          show(authGate);
+          return;
+        }
+
+        const user = API.getCurrentUser();
+        if (!user) {
+          hide(loadingEl);
+          hide(panel);
+          show(authGate);
+          return;
+        }
+
+        hide(authGate);
+        hide(loadingEl);
+        show(panel);
+        renderUser(user);
+      }
+
+      document.getElementById('logout-btn')?.addEventListener('click', function () {
+        if (!confirm('Bạn có chắc muốn đăng xuất khỏi tài khoản này?')) return;
+        if (window.API && typeof API.logout === 'function') {
+          API.logout();
+        } else {
+          localStorage.removeItem('ct_current_user');
+        }
+        if (typeof showToast === 'function') {
+          showToast('Đã đăng xuất thành công.', 'success');
+        }
+        setTimeout(function () {
+          window.location.href = 'login.html';
+        }, 400);
+      });
+
+      // Chạy sau khi main.js khởi tạo header
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+</body>
+</html>

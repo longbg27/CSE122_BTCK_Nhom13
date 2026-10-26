@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý Bộ sưu tập – Hành trình văn hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> Hành Trình Văn Hóa</a>
+      <nav class="nav-main">
+        <a href="curator-duyet-ndung.html">Duyệt nội dung</a>
+        <a href="curator-qly-bosuutap.html" class="active">Bộ sưu tập</a>
+        <a href="curator-ndung-bdo.html">Bản đồ nội dung</a>
+        <a href="ad-bangdieukhien.html">Bảng điều khiển</a>
+      </nav>
+      <div class="header-actions"><button class="menu-toggle" aria-label="Menu">☰</button></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-header flex-between" style="flex-wrap:wrap;gap:1rem;">
+        <div>
+          <h1>Quản lý Bộ sưu tập</h1>
+          <p class="subtitle">Tập hợp câu chuyện theo chủ đề / di sản</p>
+        </div>
+        <a href="curator-collection-form.html" class="btn btn-primary">+ Tạo Bộ sưu tập</a>
+      </div>
+
+      <div class="filter-bar mb-2">
+        <input type="search" id="q" class="form-control" placeholder="Tìm collection..." style="max-width:240px;">
+        <select id="status" class="form-control" style="max-width:160px;">
+          <option value="all">Mọi trạng thái</option>
+          <option value="published">Đã xuất bản</option>
+          <option value="draft">Nháp</option>
+          <option value="archived">Đã lưu trữ</option>
+        </select>
+      </div>
+
+      <div id="list">
+        <div class="state-box"><div class="spinner"></div><p>Đang tải...</p></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 CultureTrail</div></div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    let cols = [];
+
+    async function load() {
+      cols = await API.getCollections();
+      render();
+    }
+
+    function badgeClass(st) {
+      if (st === 'published') return 'badge-success';
+      if (st === 'draft') return 'badge-warning';
+      return 'badge';
+    }
+
+    function render() {
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const st = document.getElementById('status').value;
+      let list = cols;
+      if (st !== 'all') list = list.filter(c => c.status === st);
+      if (q) list = list.filter(c => (c.title || '').toLowerCase().includes(q) || (c.description || '').toLowerCase().includes(q));
+
+      const el = document.getElementById('list');
+      if (!list.length) {
+        el.innerHTML = '<div class="state-box"><div class="icon">📚</div><h3>Chưa có collection</h3><p>Tạo collection đầu tiên để nhóm câu chuyện.</p><a href="curator-collection-form.html" class="btn btn-primary mt-2">Tạo collection</a></div>';
+        return;
+      }
+
+      el.innerHTML = list.map(c => `
+        <article class="card mb-2">
+          <div class="card-body">
+            <div class="flex-between" style="flex-wrap:wrap;gap:0.75rem;">
+              <div style="display:flex;gap:1rem;align-items:flex-start;flex:1;min-width:200px;">
+                ${c.coverImage ? `<img src="${escapeHtml(c.coverImage)}" alt="" width="96" height="64" style="object-fit:cover;border-radius:8px;">` : ''}
+                <div>
+                  <span class="badge ${badgeClass(c.status)}">${statusLabel(c.status || 'draft')}</span>
+                  <h3 class="card-title mt-1" style="margin-bottom:0.25rem;">${escapeHtml(c.title)}</h3>
+                  <p class="card-text text-muted">${escapeHtml(c.description || '')}</p>
+                  <div class="card-meta">
+                    <span>${(c.storyIds || []).length} câu chuyện</span>
+                    <span>👁 ${c.views || 0}</span>
+                    <span>📅 ${formatDate(c.updatedAt || c.createdAt)}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex gap-1" style="flex-wrap:wrap;">
+                <a href="curator-collection-form.html?id=${encodeURIComponent(c.id)}" class="btn btn-outline btn-sm">Sửa</a>
+                ${c.status !== 'published' ? `<button class="btn btn-primary btn-sm" onclick="setStatus('${c.id}','published')">Xuất bản</button>` : ''}
+                ${c.status === 'published' ? `<button class="btn btn-ghost btn-sm" onclick="setStatus('${c.id}','draft')">Về nháp</button>` : ''}
+                ${c.status !== 'archived' ? `<button class="btn btn-ghost btn-sm" onclick="setStatus('${c.id}','archived')">Lưu trữ</button>` : `<button class="btn btn-ghost btn-sm" onclick="setStatus('${c.id}','draft')">Khôi phục</button>`}
+                <button class="btn btn-outline btn-sm" onclick="removeCol('${c.id}')">Xóa</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    window.setStatus = async function(id, status) {
+      await API.updateCollection(id, { status });
+      showToast('Đã cập nhật trạng thái: ' + status, 'success');
+      load();
+    };
+
+    window.removeCol = async function(id) {
+      if (!confirm('Xóa collection này?')) return;
+      await API.deleteCollection(id);
+      showToast('Đã xóa collection.', 'info');
+      load();
+    };
+
+    document.getElementById('q').addEventListener('input', render);
+    document.getElementById('status').addEventListener('change', render);
+    load();
+  </script>
+</body>
+</html>

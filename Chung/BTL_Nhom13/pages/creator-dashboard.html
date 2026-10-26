@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng điều khiển Nghệ nhân – Hành trình văn hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> Hành trình văn hóa</a>
+      <nav class="nav-main" aria-label="Khu vực nghệ nhân">
+        <a href="creator-dashboard.html" class="active" aria-current="page">Bảng điều khiển</a>
+        <a href="creator-story-management.html">Câu chuyện</a>
+        <a href="creator-event-management.html">Sự kiện</a>
+        <a href="creator-profile.html">Hồ sơ</a>
+      </nav>
+      <div class="header-actions">
+        <a href="notifications.html" class="btn-icon notif-btn" aria-label="Thông báo" title="Thông báo">
+          <span aria-hidden="true">🔔</span><span class="notif-badge hidden" data-notif-badge>0</span>
+        </a>
+        <a href="creator-profile.html" class="avatar-link" aria-label="Hồ sơ của tôi">
+          <img src="https://i.pravatar.cc/150?img=12" alt="" class="user-avatar" data-user-avatar>
+        </a>
+        <button class="menu-toggle" aria-label="Mở menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content" id="main-content">
+    <div class="container">
+      <div class="page-header">
+        <h1> Bảng điều khiển Nghệ nhân</h1>
+        <p class="subtitle" id="welcome">Tổng quan hoạt động của bạn trên CultureTrail</p>
+      </div>
+
+      <div id="dashboard-loading" class="state-box">
+        <div class="spinner"></div>
+        <p>Đang tải tổng quan...</p>
+      </div>
+
+      <div id="dashboard-error" class="hidden">
+        <div class="state-box">
+          <div class="icon" aria-hidden="true">⚠️</div>
+          <h2>Không tải được dashboard</h2>
+          <p>Dữ liệu câu chuyện hoặc sự kiện chưa sẵn sàng. Kiểm tra kết nối rồi thử lại.</p>
+          <div class="state-actions">
+            <button type="button" class="btn btn-primary" id="retry-btn">Thử lại</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="dashboard-content" class="hidden">
+        <div class="grid grid-4 mb-3">
+          <div class="card" style="padding:1.25rem;text-align:center;">
+            <div style="font-size:1.75rem;font-weight:700;color:var(--color-primary);" id="stat-stories">—</div>
+            <div class="text-muted">Câu chuyện</div>
+          </div>
+          <div class="card" style="padding:1.25rem;text-align:center;">
+            <div style="font-size:1.75rem;font-weight:700;color:var(--color-secondary);" id="stat-events">—</div>
+            <div class="text-muted">Sự kiện</div>
+          </div>
+          <div class="card" style="padding:1.25rem;text-align:center;">
+            <div style="font-size:1.75rem;font-weight:700;color:var(--color-accent);" id="stat-views">—</div>
+            <div class="text-muted">Lượt xem câu chuyện</div>
+          </div>
+          <div class="card" style="padding:1.25rem;text-align:center;">
+            <div style="font-size:1.75rem;font-weight:700;" id="stat-pending">—</div>
+            <div class="text-muted">Chờ duyệt</div>
+          </div>
+        </div>
+
+        <div class="page-actions mb-3">
+          <a href="creator-story-form.html" class="btn btn-primary">+ Tạo câu chuyện mới</a>
+          <a href="creator-event-form.html" class="btn btn-outline">+ Tạo sự kiện</a>
+          <a href="notifications.html" class="btn btn-ghost">Xem thông báo</a>
+        </div>
+
+        <div class="grid grid-2">
+          <section aria-labelledby="recent-stories-title">
+            <div class="section-head">
+              <h2 id="recent-stories-title">Câu chuyện gần đây</h2>
+              <a href="creator-story-management.html">Quản lý →</a>
+            </div>
+            <div id="recent-stories"></div>
+          </section>
+
+          <section aria-labelledby="upcoming-events-title">
+            <div class="section-head">
+              <h2 id="upcoming-events-title">Sự kiện sắp tới</h2>
+              <a href="creator-event-management.html">Quản lý →</a>
+            </div>
+            <div id="upcoming-events"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 CultureTrail – BTL CSE122</div>
+    </div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    const CREATOR_ID = getActiveCreatorId();
+
+    const loadingEl = document.getElementById('dashboard-loading');
+    const errorEl = document.getElementById('dashboard-error');
+    const contentEl = document.getElementById('dashboard-content');
+
+    async function load() {
+      loadingEl.classList.remove('hidden');
+      errorEl.classList.add('hidden');
+      contentEl.classList.add('hidden');
+
+      try {
+        const [stories, events, creator] = await Promise.all([
+          API.getStories(),
+          API.getEvents(),
+          API.getCreator(CREATOR_ID)
+        ]);
+
+        if (API.getLoadError('stories.json') || API.getLoadError('events.json')) {
+          throw new Error('load');
+        }
+
+        const myStories = stories.filter(s => s.creatorId === CREATOR_ID);
+        const myEvents = events.filter(e => e.creatorId === CREATOR_ID);
+        const user = API.getCurrentUser();
+        const displayName = (creator && creator.name) || (user && user.name) || 'bạn';
+
+        document.getElementById('welcome').textContent =
+          `Xin chào ${displayName}. Đây là tổng quan hoạt động của bạn.`;
+
+        document.getElementById('stat-stories').textContent = myStories.length.toLocaleString('vi-VN');
+        document.getElementById('stat-events').textContent = myEvents.length.toLocaleString('vi-VN');
+        document.getElementById('stat-views').textContent =
+          myStories.reduce((sum, s) => sum + (Number(s.views) || 0), 0).toLocaleString('vi-VN');
+        document.getElementById('stat-pending').textContent =
+          myStories.filter(s => s.status === 'pending').length.toLocaleString('vi-VN');
+
+        renderRecentStories(myStories);
+        renderUpcomingEvents(myEvents);
+
+        loadingEl.classList.add('hidden');
+        contentEl.classList.remove('hidden');
+      } catch (err) {
+        loadingEl.classList.add('hidden');
+        errorEl.classList.remove('hidden');
+      }
+    }
+
+    function renderRecentStories(stories) {
+      const container = document.getElementById('recent-stories');
+      const recent = [...stories]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 4);
+
+      if (!recent.length) {
+        container.innerHTML = `
+          <div class="card">
+            <div class="state-box">
+              <div class="icon" aria-hidden="true">✍️</div>
+              <h3>Chưa có câu chuyện nào</h3>
+              <p>Chia sẻ câu chuyện văn hóa đầu tiên của bạn.</p>
+              <div class="state-actions">
+                <a href="creator-story-form.html" class="btn btn-primary">+ Tạo câu chuyện</a>
+              </div>
+            </div>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = recent.map(story => `
+        <article class="card mb-2">
+          <div class="card-body flex-between" style="gap:1rem;flex-wrap:wrap;">
+            <div style="min-width:0;">
+              <h3 class="card-title">${escapeHtml(story.title)}</h3>
+              <div class="card-meta">
+                <span class="badge ${statusBadgeClass(story.status)}">${statusLabel(story.status)}</span>
+                <span>👁 ${(Number(story.views) || 0).toLocaleString('vi-VN')}</span>
+                <span>${formatDate(story.createdAt)}</span>
+              </div>
+            </div>
+            <a href="creator-story-form.html?id=${story.id}" class="btn btn-ghost btn-sm">Sửa</a>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderUpcomingEvents(events) {
+      const container = document.getElementById('upcoming-events');
+      const upcoming = events
+        .filter(e => e.status === 'upcoming' || e.status === 'ongoing')
+        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+        .slice(0, 3);
+
+      if (!upcoming.length) {
+        container.innerHTML = `
+          <div class="card">
+            <div class="state-box">
+              <div class="icon" aria-hidden="true">📅</div>
+              <h3>Không có sự kiện sắp tới</h3>
+              <p>Tạo sự kiện để kết nối cộng đồng với văn hóa địa phương.</p>
+              <div class="state-actions">
+                <a href="creator-event-form.html" class="btn btn-primary">+ Tạo sự kiện</a>
+              </div>
+            </div>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = '<div class="card" style="padding:0.75rem;">' + upcoming.map(event => `
+        <a class="card event-mini" href="creator-event-form.html?id=${event.id}">
+          <div class="flex-between" style="gap:0.5rem;align-items:flex-start;">
+            <strong>${escapeHtml(event.title)}</strong>
+            <span class="badge ${statusBadgeClass(event.status)}">${statusLabel(event.status)}</span>
+          </div>
+          <div class="card-meta">
+            <span>📅 ${formatDateTime(event.startDate)}</span>
+            <span>👥 ${(Number(event.registered) || 0).toLocaleString('vi-VN')}/${(Number(event.capacity) || 0).toLocaleString('vi-VN')}</span>
+          </div>
+        </a>
+      `).join('') + '</div>';
+    }
+
+    document.getElementById('retry-btn').addEventListener('click', load);
+
+    load();
+  </script>
+</body>
+</html>

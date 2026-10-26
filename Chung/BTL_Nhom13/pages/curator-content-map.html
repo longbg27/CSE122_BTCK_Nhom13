@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bản đồ nội dung – Hành trình văn hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> Hành Trình Văn Hóa</a>
+      <nav class="nav-main">
+        <a href="curator-duyet-ndung.html">Duyệt nội dung</a>
+        <a href="curator-qly-bosuutap.html">Bộ sưu tập</a>
+        <a href="curator-ndung-bdo.html" class="active">Bản đồ nội dung</a>
+        <a href="ad-bangdieukhien.html">Bảng điều khiển</a>
+      </nav>
+      <div class="header-actions"><button class="menu-toggle" aria-label="Menu">☰</button></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-header">
+        <h1>Bản đồ nội dung</h1>
+        <p class="subtitle">Gắn tag, xem phân bố địa điểm & câu chuyện theo vùng</p>
+      </div>
+
+      <div class="filter-bar mb-2">
+        <input type="search" id="q" class="form-control" placeholder="Tìm địa điểm / câu chuyện..." style="max-width:260px;">
+        <select id="region" class="form-control" style="max-width:180px;">
+          <option value="all">Mọi vùng</option>
+        </select>
+        <select id="tag-filter" class="form-control" style="max-width:180px;">
+          <option value="all">Mọi tag</option>
+        </select>
+      </div>
+
+      <div class="grid grid-2" style="align-items:start;">
+        <div>
+          <h3 class="mb-2">Địa điểm</h3>
+          <div id="places">
+            <div class="state-box"><div class="spinner"></div><p>Đang tải...</p></div>
+          </div>
+        </div>
+        <div>
+          <h3 class="mb-2">Gắn tag nhanh</h3>
+          <div class="card" style="padding:1.25rem;">
+            <p class="text-muted mb-2" id="selected-label">Chọn một địa điểm hoặc câu chuyện bên trái.</p>
+            <div id="tag-panel" style="display:none;">
+              <div class="form-group">
+                <label class="form-label">Tags hiện tại</label>
+                <div id="current-tags" class="flex gap-1" style="flex-wrap:wrap;"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="add-tag">Thêm tag</label>
+                <div class="flex gap-1">
+                  <input type="text" id="add-tag" class="form-control" list="tag-list" placeholder="Nhập hoặc chọn tag">
+                  <datalist id="tag-list"></datalist>
+                  <button type="button" class="btn btn-primary" id="btn-add-tag">Thêm</button>
+                </div>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" id="btn-clear-sel">Bỏ chọn</button>
+            </div>
+          </div>
+
+          <h3 class="mb-2 mt-3">Câu chuyện theo địa điểm đã chọn</h3>
+          <div id="stories-side">
+            <div class="state-box" style="padding:1.5rem;"><p class="text-muted">Chọn địa điểm để xem câu chuyện gắn kèm.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 CultureTrail</div></div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    let places = [], stories = [], tags = [];
+    let selected = null; // { type: 'place'|'story', id }
+
+    async function load() {
+      [places, stories, tags] = await Promise.all([
+        API.getPlaces(), API.getStories(), API.getTags()
+      ]);
+      const regions = [...new Set(places.map(p => p.region).filter(Boolean))].sort();
+      const regSel = document.getElementById('region');
+      regions.forEach(r => {
+        const o = document.createElement('option');
+        o.value = r; o.textContent = r;
+        regSel.appendChild(o);
+      });
+      const tagSel = document.getElementById('tag-filter');
+      const dl = document.getElementById('tag-list');
+      tags.forEach(t => {
+        const o = document.createElement('option');
+        o.value = t.name; o.textContent = t.name;
+        tagSel.appendChild(o.cloneNode(true));
+        dl.appendChild(o);
+      });
+      renderPlaces();
+    }
+
+    function filteredPlaces() {
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const region = document.getElementById('region').value;
+      const tag = document.getElementById('tag-filter').value;
+      let list = places;
+      if (region !== 'all') list = list.filter(p => p.region === region);
+      if (tag !== 'all') list = list.filter(p => (p.tags || []).includes(tag));
+      if (q) list = list.filter(p =>
+        (p.name || '').toLowerCase().includes(q) ||
+        (p.address || '').toLowerCase().includes(q) ||
+        (p.region || '').toLowerCase().includes(q)
+      );
+      return list;
+    }
+
+    function renderPlaces() {
+      const list = filteredPlaces();
+      const el = document.getElementById('places');
+      if (!list.length) {
+        el.innerHTML = '<div class="state-box"><div class="icon">📍</div><h3>Không có địa điểm</h3><p>Thử đổi bộ lọc.</p></div>';
+        return;
+      }
+      el.innerHTML = list.map(p => {
+        const sc = stories.filter(s => s.placeId === p.id).length;
+        const active = selected && selected.type === 'place' && selected.id === p.id;
+        return `
+          <article class="card mb-2" style="${active ? 'outline:2px solid var(--color-primary);' : ''}">
+            <div class="card-body" style="cursor:pointer;" onclick="selectPlace('${p.id}')">
+              <div class="flex-between">
+                <div>
+                  <h3 class="card-title" style="margin:0 0 0.25rem;">${escapeHtml(p.name)}</h3>
+                  <p class="text-muted" style="font-size:0.85rem;margin:0;">${escapeHtml(p.region || '')} · ${sc} câu chuyện</p>
+                  <div class="mt-1">${(p.tags || []).slice(0, 4).map(t => `<span class="badge badge-primary">${escapeHtml(t)}</span>`).join(' ')}</div>
+                </div>
+                <span class="text-muted" style="font-size:0.8rem;">${p.latitude ? p.latitude.toFixed(2) + ', ' + p.longitude.toFixed(2) : ''}</span>
+              </div>
+            </div>
+          </article>`;
+      }).join('');
+    }
+
+    window.selectPlace = function(id) {
+      selected = { type: 'place', id };
+      const p = places.find(x => x.id === id);
+      document.getElementById('selected-label').textContent = 'Địa điểm: ' + (p ? p.name : id);
+      document.getElementById('tag-panel').style.display = 'block';
+      renderCurrentTags(p ? (p.tags || []) : []);
+      renderStoriesForPlace(id);
+      renderPlaces();
+    };
+
+    function renderCurrentTags(arr) {
+      const el = document.getElementById('current-tags');
+      if (!arr.length) {
+        el.innerHTML = '<span class="text-muted">Chưa có tag</span>';
+        return;
+      }
+      el.innerHTML = arr.map(t =>
+        `<span class="badge badge-primary" style="cursor:pointer;" title="Gỡ tag" onclick="removeTag('${escapeHtml(t)}')">${escapeHtml(t)} ×</span>`
+      ).join('');
+    }
+
+    function renderStoriesForPlace(placeId) {
+      const list = stories.filter(s => s.placeId === placeId);
+      const el = document.getElementById('stories-side');
+      if (!list.length) {
+        el.innerHTML = '<div class="state-box" style="padding:1rem;"><p class="text-muted">Chưa có câu chuyện tại địa điểm này.</p></div>';
+        return;
+      }
+      el.innerHTML = list.map(s => `
+        <article class="card mb-1">
+          <div class="card-body" style="padding:0.75rem 1rem;">
+            <div class="flex-between" style="gap:0.5rem;">
+              <div>
+                <strong>${escapeHtml(s.title)}</strong>
+                <div class="mt-1">${(s.tags || []).slice(0, 3).map(t => `<span class="badge">${escapeHtml(t)}</span>`).join(' ')}</div>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="selectStory('${s.id}')">Gắn tag</button>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    window.selectStory = function(id) {
+      selected = { type: 'story', id };
+      const s = stories.find(x => x.id === id);
+      document.getElementById('selected-label').textContent = 'Câu chuyện: ' + (s ? s.title : id);
+      document.getElementById('tag-panel').style.display = 'block';
+      renderCurrentTags(s ? (s.tags || []) : []);
+    };
+
+    window.removeTag = async function(tagName) {
+      if (!selected) return;
+      if (selected.type === 'place') {
+        const p = places.find(x => x.id === selected.id);
+        if (!p) return;
+        p.tags = (p.tags || []).filter(t => t !== tagName);
+        // places không có updatePlace trong API – lưu qua localStorage trực tiếp
+        const all = await API.getPlaces();
+        const idx = all.findIndex(x => x.id === p.id);
+        if (idx >= 0) { all[idx] = p; localStorage.setItem('ct_places', JSON.stringify(all)); places = all; }
+        renderCurrentTags(p.tags);
+        renderPlaces();
+        showToast('Đã gỡ tag khỏi địa điểm.', 'info');
+      } else {
+        const s = stories.find(x => x.id === selected.id);
+        if (!s) return;
+        const next = (s.tags || []).filter(t => t !== tagName);
+        await API.updateStory(s.id, { tags: next });
+        s.tags = next;
+        renderCurrentTags(next);
+        if (s.placeId) renderStoriesForPlace(s.placeId);
+        showToast('Đã gỡ tag khỏi câu chuyện.', 'info');
+      }
+    };
+
+    document.getElementById('btn-add-tag').addEventListener('click', async () => {
+      if (!selected) return;
+      const input = document.getElementById('add-tag');
+      const name = input.value.trim();
+      if (!name) { showToast('Nhập tên tag.', 'error'); return; }
+      if (selected.type === 'place') {
+        const p = places.find(x => x.id === selected.id);
+        if (!p) return;
+        if ((p.tags || []).includes(name)) { showToast('Tag đã có.', 'info'); return; }
+        p.tags = [...(p.tags || []), name];
+        const all = await API.getPlaces();
+        const idx = all.findIndex(x => x.id === p.id);
+        if (idx >= 0) { all[idx] = p; localStorage.setItem('ct_places', JSON.stringify(all)); places = all; }
+        renderCurrentTags(p.tags);
+        renderPlaces();
+      } else {
+        const s = stories.find(x => x.id === selected.id);
+        if (!s) return;
+        if ((s.tags || []).includes(name)) { showToast('Tag đã có.', 'info'); return; }
+        const next = [...(s.tags || []), name];
+        await API.updateStory(s.id, { tags: next });
+        s.tags = next;
+        renderCurrentTags(next);
+        if (s.placeId) renderStoriesForPlace(s.placeId);
+      }
+      // đảm bảo tag tồn tại trong taxonomy
+      if (!tags.some(t => t.name === name)) {
+        await API.createTag({ name, category: 'chủ đề' });
+        tags = await API.getTags();
+      }
+      input.value = '';
+      showToast('Đã thêm tag.', 'success');
+    });
+
+    document.getElementById('btn-clear-sel').addEventListener('click', () => {
+      selected = null;
+      document.getElementById('tag-panel').style.display = 'none';
+      document.getElementById('selected-label').textContent = 'Chọn một địa điểm hoặc câu chuyện bên trái.';
+      document.getElementById('stories-side').innerHTML = '<div class="state-box" style="padding:1.5rem;"><p class="text-muted">Chọn địa điểm để xem câu chuyện gắn kèm.</p></div>';
+      renderPlaces();
+    });
+
+    document.getElementById('q').addEventListener('input', renderPlaces);
+    document.getElementById('region').addEventListener('change', renderPlaces);
+    document.getElementById('tag-filter').addEventListener('change', renderPlaces);
+
+    load();
+  </script>
+</body>
+</html>

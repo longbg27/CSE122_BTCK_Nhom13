@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cài đặt cá nhân – Hành trình văn hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> Hành Trình Văn Hóa</a>
+      <nav class="nav-main">
+        <a href="index.html">Trang chủ</a>
+        <a href="profile.html">Hồ sơ</a>
+        <a href="settings.html" class="active">Cài đặt</a>
+        <a href="notifications.html">Thông báo</a>
+      </nav>
+      <div class="header-actions"><button class="menu-toggle" aria-label="Menu">☰</button></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container" style="max-width:640px;">
+      <div class="page-header">
+        <h1>Cài đặt cá nhân</h1>
+        <p class="subtitle">Tùy chỉnh trải nghiệm và thông báo</p>
+      </div>
+
+      <div id="auth-gate" class="card" style="padding:2rem;text-align:center;display:none;">
+        <p class="mb-2">Bạn cần đăng nhập để quản lý cài đặt.</p>
+        <a href="login.html" class="btn btn-primary">Đăng nhập</a>
+      </div>
+
+      <div id="settings-panel" style="display:none;">
+        <form id="settings-form" class="card" style="padding:1.5rem;" novalidate>
+          <h3 class="mb-2">Giao diện</h3>
+          <div class="form-group">
+            <label class="form-label" for="theme">Chủ đề</label>
+            <select id="theme" class="form-control">
+              <option value="light">Sáng</option>
+              <option value="dark">Tối (thử nghiệm)</option>
+              <option value="system">Theo hệ thống</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lang">Ngôn ngữ</label>
+            <select id="lang" class="form-control">
+              <option value="vi">Tiếng Việt</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+
+          <h3 class="mb-2 mt-3">Thông báo</h3>
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+              <input type="checkbox" id="notif-email" checked>
+              <span>Nhận email khi có nội dung mới / duyệt</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+              <input type="checkbox" id="notif-push" checked>
+              <span>Thông báo trong ứng dụng</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+              <input type="checkbox" id="notif-marketing">
+              <span>Nhận tin sự kiện văn hóa & khuyến mãi</span>
+            </label>
+          </div>
+
+          <h3 class="mb-2 mt-3">Quyền riêng tư</h3>
+          <div class="form-group">
+            <label class="form-label" for="profile-vis">Hiển thị hồ sơ</label>
+            <select id="profile-vis" class="form-control">
+              <option value="public">Công khai</option>
+              <option value="followers">Chỉ người theo dõi</option>
+              <option value="private">Riêng tư</option>
+            </select>
+          </div>
+
+          <div class="flex gap-1" style="flex-wrap:wrap;">
+            <button type="submit" class="btn btn-primary">Lưu cài đặt</button>
+            <button type="button" class="btn btn-outline" id="btn-reset-local">Khôi phục mặc định</button>
+          </div>
+        </form>
+
+        <div class="card mt-3" style="padding:1.5rem;">
+          <h3 class="mb-2">Dữ liệu demo</h3>
+          <p class="text-muted mb-2">Xóa dữ liệu LocalStorage và tải lại seed ban đầu.</p>
+          <button type="button" class="btn btn-outline" id="btn-reset-data">Reset dữ liệu mẫu</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 CultureTrail</div></div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    const KEY = 'ct_user_settings';
+    const defaults = {
+      theme: 'light', lang: 'vi', notifEmail: true, notifPush: true,
+      notifMarketing: false, profileVis: 'public'
+    };
+
+    function loadSettings() {
+      try { return { ...defaults, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; }
+      catch { return { ...defaults }; }
+    }
+
+    function applyToForm(s) {
+      document.getElementById('theme').value = s.theme;
+      document.getElementById('lang').value = s.lang;
+      document.getElementById('notif-email').checked = !!s.notifEmail;
+      document.getElementById('notif-push').checked = !!s.notifPush;
+      document.getElementById('notif-marketing').checked = !!s.notifMarketing;
+      document.getElementById('profile-vis').value = s.profileVis;
+    }
+
+    const user = API.getCurrentUser();
+    if (!user) {
+      document.getElementById('auth-gate').style.display = 'block';
+    } else {
+      document.getElementById('settings-panel').style.display = 'block';
+      applyToForm(loadSettings());
+    }
+
+    document.getElementById('settings-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const s = {
+        theme: document.getElementById('theme').value,
+        lang: document.getElementById('lang').value,
+        notifEmail: document.getElementById('notif-email').checked,
+        notifPush: document.getElementById('notif-push').checked,
+        notifMarketing: document.getElementById('notif-marketing').checked,
+        profileVis: document.getElementById('profile-vis').value
+      };
+      localStorage.setItem(KEY, JSON.stringify(s));
+      showToast('Đã lưu cài đặt.', 'success');
+    });
+
+    document.getElementById('btn-reset-local')?.addEventListener('click', () => {
+      localStorage.removeItem(KEY);
+      applyToForm(defaults);
+      showToast('Đã khôi phục mặc định.', 'info');
+    });
+
+    document.getElementById('btn-reset-data')?.addEventListener('click', () => {
+      if (!confirm('Xóa toàn bộ dữ liệu LocalStorage và tải lại seed?')) return;
+      API.resetAll();
+      showToast('Đã reset dữ liệu. Tải lại trang.', 'success');
+      setTimeout(() => location.reload(), 800);
+    });
+  </script>
+</body>
+</html>

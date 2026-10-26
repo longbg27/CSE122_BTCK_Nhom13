@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý Tags – Hành trình văn hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> Hành Trình Văn Hóa</a>
+      <nav class="nav-main">
+        <a href="ad-bangdieukhien.html">Bảng điều khiển</a>
+        <a href="ad-qly-user.html">Người dùng</a>
+        <a href="ad-qly-tags.html" class="active">Tags</a>
+        <a href="ad-caidat.html">Cài đặt</a>
+      </nav>
+      <div class="header-actions"><button class="menu-toggle" aria-label="Menu">☰</button></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-header flex-between" style="flex-wrap:wrap;gap:1rem;">
+        <div>
+          <h1>Quản lý Tags</h1>
+          <p class="subtitle">Taxonomy chủ đề & địa danh</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-add">+ Thêm tag</button>
+      </div>
+
+      <div class="filter-bar mb-2">
+        <input type="search" id="q" class="form-control" placeholder="Tìm tag..." style="max-width:240px;">
+        <select id="cat" class="form-control" style="max-width:180px;">
+          <option value="all">Tất cả danh mục</option>
+          <option value="chủ đề">Chủ đề</option>
+          <option value="địa danh">Địa danh</option>
+        </select>
+      </div>
+
+      <div id="list">
+        <div class="state-box"><div class="spinner"></div><p>Đang tải...</p></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal form -->
+  <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:1rem;">
+    <div class="card" style="width:100%;max-width:420px;padding:1.5rem;" role="dialog" aria-labelledby="modal-title">
+      <h2 id="modal-title" style="margin-top:0;">Thêm tag</h2>
+      <form id="tag-form" novalidate>
+        <input type="hidden" id="tag-id">
+        <div class="form-group">
+          <label class="form-label" for="tag-name">Tên tag *</label>
+          <input type="text" id="tag-name" class="form-control" required>
+          <div class="form-error">Bắt buộc.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="tag-cat">Danh mục</label>
+          <select id="tag-cat" class="form-control">
+            <option value="chủ đề">Chủ đề</option>
+            <option value="địa danh">Địa danh</option>
+          </select>
+        </div>
+        <div class="flex gap-1">
+          <button type="submit" class="btn btn-primary">Lưu</button>
+          <button type="button" class="btn btn-ghost" id="btn-cancel">Hủy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container"><div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 CultureTrail</div></div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    let tags = [];
+
+    async function load() {
+      tags = await API.getTags();
+      render();
+    }
+
+    function render() {
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const cat = document.getElementById('cat').value;
+      let list = tags;
+      if (cat !== 'all') list = list.filter(t => t.category === cat);
+      if (q) list = list.filter(t => t.name.toLowerCase().includes(q));
+
+      const el = document.getElementById('list');
+      if (!list.length) {
+        el.innerHTML = '<div class="state-box"><div class="icon">🏷️</div><h3>Không có tag</h3><p>Thử đổi bộ lọc hoặc thêm tag mới.</p></div>';
+        return;
+      }
+      el.innerHTML = `
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>Tên</th><th>Danh mục</th><th>Lượt dùng</th><th></th></tr></thead>
+            <tbody>
+              ${list.map(t => `
+                <tr>
+                  <td><strong>${escapeHtml(t.name)}</strong></td>
+                  <td><span class="badge">${escapeHtml(t.category)}</span></td>
+                  <td>${t.usageCount || 0}</td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" onclick="openEdit('${t.id}')">Sửa</button>
+                    <button class="btn btn-outline btn-sm" onclick="removeTag('${t.id}')">Xóa</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    function openModal(edit) {
+      document.getElementById('modal').style.display = 'flex';
+      document.getElementById('modal-title').textContent = edit ? 'Sửa tag' : 'Thêm tag';
+      if (!edit) {
+        document.getElementById('tag-id').value = '';
+        document.getElementById('tag-name').value = '';
+        document.getElementById('tag-cat').value = 'chủ đề';
+      }
+    }
+    function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+
+    window.openEdit = function(id) {
+      const t = tags.find(x => x.id === id);
+      if (!t) return;
+      document.getElementById('tag-id').value = t.id;
+      document.getElementById('tag-name').value = t.name;
+      document.getElementById('tag-cat').value = t.category || 'chủ đề';
+      openModal(true);
+    };
+
+    window.removeTag = async function(id) {
+      if (!confirm('Xóa tag này?')) return;
+      await API.deleteTag(id);
+      showToast('Đã xóa tag.', 'info');
+      load();
+    };
+
+    document.getElementById('btn-add').addEventListener('click', () => openModal(false));
+    document.getElementById('btn-cancel').addEventListener('click', closeModal);
+    document.getElementById('q').addEventListener('input', render);
+    document.getElementById('cat').addEventListener('change', render);
+
+    document.getElementById('tag-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nameEl = document.getElementById('tag-name');
+      const name = nameEl.value.trim();
+      if (!name) {
+        nameEl.classList.add('is-invalid');
+        return;
+      }
+      nameEl.classList.remove('is-invalid');
+      const id = document.getElementById('tag-id').value;
+      const category = document.getElementById('tag-cat').value;
+      if (id) {
+        await API.updateTag(id, { name, category });
+        showToast('Đã cập nhật tag.', 'success');
+      } else {
+        await API.createTag({ name, category });
+        showToast('Đã thêm tag.', 'success');
+      }
+      closeModal();
+      load();
+    });
+
+    load();
+  </script>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng ký – CultureTrail</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">HT</span>
+        Hành trình văn hóa
+      </a>
+      <div class="header-actions">
+        <a href="login.html" class="btn btn-outline btn-sm">Đăng nhập</a>
+        <button class="menu-toggle" aria-label="Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content" id="main-content">
+    <div class="container" style="max-width: 480px;">
+      <div class="card auth-card">
+        <h1 class="text-center mb-1">Tạo tài khoản</h1>
+        <p class="text-muted text-center mb-3">Tham gia cộng đồng khám phá văn hóa</p>
+
+        <div id="alert-box" aria-live="polite"></div>
+
+        <form id="register-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="name">Họ và tên *</label>
+            <input type="text" id="name" class="form-control" required maxlength="60"
+                   autocomplete="name" placeholder="Nguyễn Văn A">
+            <div class="form-error">Vui lòng nhập họ tên (ít nhất 2 ký tự).</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email *</label>
+            <input type="email" id="email" class="form-control" required
+                   autocomplete="email" placeholder="you@example.com">
+            <div class="form-error">Vui lòng nhập email hợp lệ.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="role">Vai trò mong muốn *</label>
+            <select id="role" class="form-control" required>
+              <option value="">— Chọn vai trò —</option>
+              <option value="explorer">Người khám phá</option>
+              <option value="creator">Nghệ nhân / Nhà sáng tạo</option>
+            </select>
+            <div class="form-error">Vui lòng chọn vai trò.</div>
+            <p class="form-hint" id="role-hint">Bạn có thể khám phá câu chuyện, tạo trail và lưu địa điểm yêu thích.</p>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="password">Mật khẩu *</label>
+              <input type="password" id="password" class="form-control" required minlength="6"
+                     autocomplete="new-password" placeholder="Ít nhất 6 ký tự">
+              <div class="form-error">Mật khẩu phải có ít nhất 6 ký tự.</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="confirm">Xác nhận mật khẩu *</label>
+              <input type="password" id="confirm" class="form-control" required
+                     autocomplete="new-password" placeholder="Nhập lại mật khẩu">
+              <div class="form-error">Mật khẩu xác nhận không khớp.</div>
+            </div>
+          </div>
+
+          <p class="form-hint mb-2">Tài khoản demo: mật khẩu được lưu cục bộ trên trình duyệt, không gửi tới máy chủ.</p>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Đăng ký</button>
+        </form>
+
+        <p class="text-center text-muted mt-2" style="font-size: 0.9rem;">
+          Đã có tài khoản? <a href="login.html">Đăng nhập</a>
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border: none; margin: 0; padding: 0;">
+        © 2026 CultureTrail – BTL CSE122
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    const form = document.getElementById('register-form');
+    const alertBox = document.getElementById('alert-box');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const fields = {
+      name: document.getElementById('name'),
+      email: document.getElementById('email'),
+      role: document.getElementById('role'),
+      password: document.getElementById('password'),
+      confirm: document.getElementById('confirm')
+    };
+    const ROLE_HINTS = {
+      explorer: 'Bạn có thể khám phá câu chuyện, tạo trail và lưu địa điểm yêu thích.',
+      creator: 'Bạn sẽ có dashboard nghệ nhân để đăng câu chuyện, tổ chức sự kiện và gửi curator duyệt.'
+    };
+    let submitting = false;
+
+    fields.role.addEventListener('change', () => {
+      const hint = ROLE_HINTS[fields.role.value];
+      document.getElementById('role-hint').textContent =
+        hint || 'Chọn vai trò phù hợp với cách bạn muốn tham gia CultureTrail.';
+    });
+
+    function validateRegister() {
+      let valid = true;
+
+      const name = fields.name.value.trim();
+      if (!name) {
+        setFieldError(fields.name, 'Vui lòng nhập họ tên.');
+        valid = false;
+      } else if (name.length < 2) {
+        setFieldError(fields.name, 'Họ tên cần ít nhất 2 ký tự.');
+        valid = false;
+      } else {
+        clearFieldError(fields.name);
+      }
+
+      if (!fields.email.value.trim()) {
+        setFieldError(fields.email, 'Vui lòng nhập email.');
+        valid = false;
+      } else if (!validateEmail(fields.email.value.trim())) {
+        setFieldError(fields.email, 'Email không đúng định dạng. Ví dụ: ban@example.com');
+        valid = false;
+      } else {
+        clearFieldError(fields.email);
+      }
+
+      if (!fields.role.value) {
+        setFieldError(fields.role, 'Vui lòng chọn vai trò.');
+        valid = false;
+      } else {
+        clearFieldError(fields.role);
+      }
+
+      if (!fields.password.value) {
+        setFieldError(fields.password, 'Vui lòng nhập mật khẩu.');
+        valid = false;
+      } else if (fields.password.value.length < 6) {
+        setFieldError(fields.password, 'Mật khẩu phải có ít nhất 6 ký tự.');
+        valid = false;
+      } else {
+        clearFieldError(fields.password);
+      }
+
+      if (!fields.confirm.value) {
+        setFieldError(fields.confirm, 'Vui lòng nhập lại mật khẩu.');
+        valid = false;
+      } else if (fields.confirm.value !== fields.password.value) {
+        setFieldError(fields.confirm, 'Mật khẩu xác nhận không khớp.');
+        valid = false;
+      } else {
+        clearFieldError(fields.confirm);
+      }
+
+      if (!valid) {
+        form.querySelector('.is-invalid')?.focus();
+      }
+      return valid;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (submitting || !validateRegister()) return;
+
+      submitting = true;
+      alertBox.innerHTML = '';
+      setLoading(submitBtn, true, 'Đang tạo tài khoản...');
+      await delay(700);
+
+      const email = fields.email.value.trim().toLowerCase();
+      const name = fields.name.value.trim();
+      const role = fields.role.value;
+
+      try {
+        const users = await API.getUsers();
+        if (!users.length && API.getLoadError('users.json')) {
+          throw new Error('load');
+        }
+        if (users.some(u => (u.email || '').toLowerCase() === email)) {
+          setFieldError(fields.email, 'Email này đã được sử dụng. Hãy đăng nhập hoặc dùng email khác.');
+          alertBox.innerHTML = '<div class="alert alert-error" role="alert">Email đã được sử dụng. Vui lòng chọn email khác.</div>';
+          fields.email.focus();
+          return;
+        }
+
+        const userId = `${role === 'creator' ? 'creator' : 'user'}-${Date.now()}`;
+        const avatar = `https://i.pravatar.cc/150?u=${encodeURIComponent(email)}`;
+        const newUser = {
+          id: userId,
+          name,
+          email,
+          role,
+          avatar,
+          joinedAt: new Date().toISOString(),
+          status: 'active'
+        };
+
+        await API.createUser(newUser);
+
+        if (role === 'creator') {
+          await API.createCreator({
+            id: userId,
+            name,
+            bio: '',
+            avatar,
+            region: '',
+            followers: 0
+          });
+        }
+
+        API.setCurrentUser(newUser);
+
+        alertBox.innerHTML = '<div class="alert alert-success" role="status">Đăng ký thành công! Đang chuyển hướng...</div>';
+        showToast('Tài khoản đã được tạo.', 'success');
+        setTimeout(() => {
+          location.href = role === 'creator'
+            ? 'creator-dashboard.html'
+            : 'explorer-story-discovery.html';
+        }, 900);
+      } catch (err) {
+        alertBox.innerHTML = '<div class="alert alert-error" role="alert">Không thể tạo tài khoản. Vui lòng thử lại.</div>';
+        showToast('Đăng ký thất bại.', 'error');
+      } finally {
+        if (submitting) {
+          submitting = false;
+          setLoading(submitBtn, false);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

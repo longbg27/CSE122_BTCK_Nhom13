@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý người dùng – Hành trình văn hóa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">HT</span> Hành Trình Văn Hóa</a>
+      <nav class="nav-main">
+        <a href="ad-bangdieukhien.html">Bảng điều khiển</a>
+        <a href="ad-qly-user.html" class="active">Người dùng</a>
+        <a href="ad-qly-tags.html">Tags</a>
+        <a href="ad-caidat.html">Cài đặt</a>
+      </nav>
+      <div class="header-actions"><button class="menu-toggle" aria-label="Menu">☰</button></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="page-header flex-between" style="flex-wrap:wrap;gap:1rem;">
+        <div>
+          <h1>Quản lý người dùng</h1>
+          <p class="subtitle">Thêm, sửa vai trò, khóa / mở khóa tài khoản</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-add">+ Thêm người dùng</button>
+      </div>
+
+      <div class="filter-bar mb-2">
+        <input type="search" id="q" class="form-control" placeholder="Tìm tên / email..." style="max-width:240px;">
+        <select id="role" class="form-control" style="max-width:160px;">
+          <option value="all">Mọi vai trò</option>
+          <option value="explorer">Người khám phá</option>
+          <option value="creator">Nghệ nhân</option>
+          <option value="curator">Biên tập</option>
+          <option value="admin">Quản trị viên</option>
+        </select>
+        <select id="status" class="form-control" style="max-width:140px;">
+          <option value="all">Mọi trạng thái</option>
+          <option value="active">Hoạt động</option>
+          <option value="locked">Đã khóa</option>
+        </select>
+      </div>
+
+      <div id="list">
+        <div class="state-box"><div class="spinner"></div><p>Đang tải...</p></div>
+      </div>
+    </div>
+  </main>
+
+  <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:1rem;">
+    <div class="card" style="width:100%;max-width:440px;padding:1.5rem;" role="dialog" aria-labelledby="modal-title">
+      <h2 id="modal-title" style="margin-top:0;">Thêm người dùng</h2>
+      <form id="user-form" novalidate>
+        <input type="hidden" id="user-id">
+        <div class="form-group">
+          <label class="form-label" for="user-name">Họ tên *</label>
+          <input type="text" id="user-name" class="form-control" required>
+          <div class="form-error">Bắt buộc.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="user-email">Email *</label>
+          <input type="email" id="user-email" class="form-control" required>
+          <div class="form-error">Email hợp lệ bắt buộc.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="user-role">Vai trò</label>
+          <select id="user-role" class="form-control">
+            <option value="explorer">Người khám phá</option>
+            <option value="creator">Nghệ nhân</option>
+            <option value="curator">Biên tập</option>
+            <option value="admin">Quản trị viên</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="user-status">Trạng thái</label>
+          <select id="user-status" class="form-control">
+            <option value="active">Hoạt động</option>
+            <option value="locked">Đã khóa</option>
+          </select>
+        </div>
+        <div class="flex gap-1">
+          <button type="submit" class="btn btn-primary">Lưu</button>
+          <button type="button" class="btn btn-ghost" id="btn-cancel">Hủy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container"><div class="footer-bottom" style="border:none;margin:0;padding:0;">© 2026 CultureTrail</div></div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    let users = [];
+
+    async function load() {
+      users = await API.getUsers();
+      render();
+    }
+
+    function render() {
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const role = document.getElementById('role').value;
+      const status = document.getElementById('status').value;
+      let list = users;
+      if (role !== 'all') list = list.filter(u => u.role === role);
+      if (status !== 'all') list = list.filter(u => (u.status || 'active') === status);
+      if (q) list = list.filter(u =>
+        (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q)
+      );
+
+      const el = document.getElementById('list');
+      if (!list.length) {
+        el.innerHTML = '<div class="state-box"><div class="icon">👤</div><h3>Không có người dùng</h3><p>Thử đổi bộ lọc hoặc thêm mới.</p></div>';
+        return;
+      }
+      el.innerHTML = `
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>Người dùng</th><th>Vai trò</th><th>Trạng thái</th><th>Tham gia</th><th></th></tr></thead>
+            <tbody>
+              ${list.map(u => `
+                <tr>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                      <img src="${escapeHtml(u.avatar || 'https://i.pravatar.cc/150')}" alt="" width="36" height="36" style="border-radius:50%;object-fit:cover;">
+                      <div>
+                        <strong>${escapeHtml(u.name)}</strong><br>
+                        <span class="text-muted" style="font-size:0.85rem;">${escapeHtml(u.email)}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-primary">${roleLabel(u.role)}</span></td>
+                  <td><span class="badge ${statusBadgeClass(u.status||'active')}">${statusLabel(u.status || 'active')}</span></td>
+                  <td>${formatDate(u.joinedAt)}</td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" onclick="openEdit('${u.id}')">Sửa</button>
+                    <button class="btn btn-outline btn-sm" onclick="toggleLock('${u.id}')">${(u.status||'active')==='active'?'Khóa':'Mở khóa'}</button>
+                    <button class="btn btn-ghost btn-sm" onclick="removeUser('${u.id}')">Xóa</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    function openModal(edit) {
+      document.getElementById('modal').style.display = 'flex';
+      document.getElementById('modal-title').textContent = edit ? 'Sửa người dùng' : 'Thêm người dùng';
+      if (!edit) {
+        document.getElementById('user-id').value = '';
+        document.getElementById('user-name').value = '';
+        document.getElementById('user-email').value = '';
+        document.getElementById('user-email').disabled = false;
+        document.getElementById('user-role').value = 'explorer';
+        document.getElementById('user-status').value = 'active';
+      }
+    }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+    window.openEdit = function(id) {
+      const u = users.find(x => x.id === id);
+      if (!u) return;
+      document.getElementById('user-id').value = u.id;
+      document.getElementById('user-name').value = u.name;
+      document.getElementById('user-email').value = u.email;
+      document.getElementById('user-email').disabled = true;
+      document.getElementById('user-role').value = u.role;
+      document.getElementById('user-status').value = u.status || 'active';
+      openModal(true);
+    };
+
+    window.toggleLock = async function(id) {
+      const u = users.find(x => x.id === id);
+      if (!u) return;
+      const next = (u.status || 'active') === 'active' ? 'locked' : 'active';
+      await API.updateUser(id, { status: next });
+      showToast(next === 'locked' ? 'Đã khóa tài khoản.' : 'Đã mở khóa.', 'success');
+      load();
+    };
+
+    window.removeUser = async function(id) {
+      if (!confirm('Xóa người dùng này? Hành động không hoàn tác trong demo.')) return;
+      await API.deleteUser(id);
+      showToast('Đã xóa người dùng.', 'info');
+      load();
+    };
+
+    document.getElementById('btn-add').addEventListener('click', () => openModal(false));
+    document.getElementById('btn-cancel').addEventListener('click', closeModal);
+    document.getElementById('q').addEventListener('input', render);
+    document.getElementById('role').addEventListener('change', render);
+    document.getElementById('status').addEventListener('change', render);
+
+    document.getElementById('user-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nameEl = document.getElementById('user-name');
+      const emailEl = document.getElementById('user-email');
+      const name = nameEl.value.trim();
+      const email = emailEl.value.trim();
+      let ok = true;
+      if (!name) { nameEl.classList.add('is-invalid'); ok = false; } else nameEl.classList.remove('is-invalid');
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { emailEl.classList.add('is-invalid'); ok = false; }
+      else emailEl.classList.remove('is-invalid');
+      if (!ok) return;
+
+      const id = document.getElementById('user-id').value;
+      const role = document.getElementById('user-role').value;
+      const status = document.getElementById('user-status').value;
+      if (id) {
+        await API.updateUser(id, { name, role, status });
+        showToast('Đã cập nhật người dùng.', 'success');
+      } else {
+        const res = await API.createUser({ name, email, role, status });
+        if (!res.success) {
+          showToast(res.message || 'Không tạo được.', 'error');
+          return;
+        }
+        showToast('Đã thêm người dùng.', 'success');
+      }
+      closeModal();
+      load();
+    });
+
+    load();
+  </script>
+</body>
+</html>
